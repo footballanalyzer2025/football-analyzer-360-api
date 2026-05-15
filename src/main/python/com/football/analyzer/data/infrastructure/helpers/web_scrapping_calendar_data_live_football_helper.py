@@ -127,7 +127,6 @@ class WebScrappingCalendarDataLiveFootballHelper:
             return self._parse_extra_time_match(result, scores_by_period_list)
         return self._parse_normal_match(result, scores_by_period_list)
 
-
     @staticmethod
     def _init_result():
         return {
