@@ -124,12 +124,3 @@ def init_routes(web_container_federation: WebContainerFederation):
             'success': result.success,
             'message': result.message
         }), status_code
-
-    @federation_bp.route('/federations/web-scrapping/status', methods=['GET'])
-    def get_scraping_status():
-        return jsonify({
-            'status': 'processing',
-            'message': 'Last scraping status'
-        }), 200
-
-    return federation_bp
