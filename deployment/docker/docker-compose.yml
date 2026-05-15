@@ -1,0 +1,39 @@
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: football_analyzer_mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-admin123}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-football_analyzer}
+    ports:
+      - "${MONGO_PORT:-27017}:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo/init.d:/docker-entrypoint-initdb.d:ro
+    networks:
+      - football_network
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: football_analyzer_mongo_express
+    restart: unless-stopped
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_ROOT_USER:-admin}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_ROOT_PASSWORD:-admin123}
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_ROOT_USER:-admin}:${MONGO_ROOT_PASSWORD:-admin123}@mongodb:27017/
+    ports:
+      - "${MONGO_EXPRESS_PORT:-8081}:8081"
+    depends_on:
+      - mongodb
+    networks:
+      - football_network
+
+networks:
+  football_network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+    name: football_analyzer_mongodb_data
