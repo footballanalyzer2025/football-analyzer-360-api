@@ -6,6 +6,7 @@ from typing import Dict
 from flask import current_app
 
 from .get_teams_use_case import GetTeamsUseCase
+from ...services.notification_service import NotificationService
 from ....application.dto.team_request_dto import CreateTeamsFromListRequestDTO, GetTeamsRequestDTO
 from ....commons.config.config_constants import ConfigConstants
 from ....domain.ports.repositories.team_repository_port import TeamRepositoryPort
@@ -25,10 +26,12 @@ class CreateTeamsFromListUseCase:
     def __init__(
             self,
             team_repository: TeamRepositoryPort,
+            notification_service: NotificationService,
             managers_data: Dict[str, str],
             app=None
     ):
         self._team_repository = team_repository
+        self._notification_service = notification_service
         self._get_teams_use_case = GetTeamsUseCase(self._team_repository)
         self._app = app
         self._scraping_team_adapter = WebScrappingTeamDataSourceAdapter(managers_data=managers_data)
@@ -52,10 +55,21 @@ class CreateTeamsFromListUseCase:
                         if team_name in all_teams and all_teams[team_name].get(ConfigConstants.MAIN_URL):
                             teams_to_process[team_name] = all_teams[team_name]
                     teams_data = self._scraping_team_adapter.get_main_data(teams_to_process)
-                    self._team_repository.save_teams_batch(teams_data)
-                    logger.info(f"Scraping completed. Processed {len(teams_data)} teams")
+                    self._notification_service.send_success(
+                        "Teams List Success",
+                        {
+                            "Competitions": len(dto.teams_to_create),
+                            "Teams processed": len(teams_data)
+                        }
+                    )
                 except Exception as e:
-                    logger.error(f"Background task failed: {e}")
+                    self._notification_service.send_error(
+                        "Teams List Error",
+                        e,
+                        {
+                            "competitions_by_federation": len(dto.teams_to_create)
+                        }
+                    )
 
         thread = threading.Thread(target=background_task)
         thread.start()

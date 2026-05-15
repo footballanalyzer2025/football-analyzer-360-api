@@ -49,6 +49,7 @@ class WebContainerTeam:
     def create_teams_from_list_use_case(self) -> CreateTeamsFromListUseCase:
         return CreateTeamsFromListUseCase(
             self.team_repository,
+            self._notification_container.notification_service,
             self._web_container_manager_dates.get_all_managers_use_case.execute().managers,
             self._app
         )

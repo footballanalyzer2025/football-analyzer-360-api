@@ -2,18 +2,25 @@ from ..adapters.repositories.mongodb_federation_repository import MongoDBFederat
 from ...application.use_cases.federation.create_or_update_federation_from_web_use_case import CreateOrUpdateFederationFromWebUseCase
 from ...application.use_cases.federation.delete_federation_use_case import DeleteFederationUseCase
 from ...application.use_cases.federation.get_all_federations_use_case import GetAllFederationsUseCase
-from src.main.python.com.football.analyzer.data.application.use_cases.calendar.get_calendars_use_case import GetCalendarsUseCase
+from ...application.use_cases.calendar.get_calendars_use_case import GetCalendarsUseCase
 from ...application.use_cases.federation.get_federations_use_case import GetFederationsUseCase
-from src.main.python.com.football.analyzer.data.application.use_cases.calendar.get_upcoming_matches_of_calendars_use_case import GetUpcomingMatchesUseCase
+from ...application.use_cases.calendar.get_upcoming_matches_of_calendars_use_case import GetUpcomingMatchesUseCase
 from ...domain.ports.repositories.database_connection_port import DatabaseConnectionPort
 from ...domain.ports.repositories.federation_repository_port import FederationRepositoryPort
+from .notification_container import NotificationContainer
 
 
 class WebContainerFederation:
 
-    def __init__(self, db_connection: DatabaseConnectionPort, app=None):
+    def __init__(
+        self,
+        db_connection: DatabaseConnectionPort,
+        notification_container: NotificationContainer,
+        app=None
+    ):
         self._db_connection = db_connection
         self._app = app
+        self._notification_container = notification_container
         self._federation_repository = None
 
     @property
@@ -28,7 +35,11 @@ class WebContainerFederation:
 
     @property
     def create_or_update_from_web_use_case(self) -> CreateOrUpdateFederationFromWebUseCase:
-        return CreateOrUpdateFederationFromWebUseCase(self.federation_repository, self._app)
+        return CreateOrUpdateFederationFromWebUseCase(
+            self.federation_repository,
+            self._notification_container.notification_service,
+            self._app
+        )
 
     @property
     def get_federations_use_case(self) -> GetFederationsUseCase:

@@ -3,6 +3,7 @@ from time import sleep
 from typing import Dict, Optional
 
 import requests
+from requests import ReadTimeout
 
 from src.main.python.com.football.analyzer.data.domain.ports.http.http_requester_port import HttpRequesterPort
 
@@ -23,8 +24,7 @@ class HttpRequesterAdapter(HttpRequesterPort):
                 response = requests.get(url, timeout=self.default_timeout, headers=self.default_headers)
                 response.raise_for_status()
                 has_response = True
-            except Exception as err:
+            except ReadTimeout:
                 sleep(time_sleep)
                 time_sleep += 1
-                self.logger.error(f"HttpRequesterException in {url}: {err}")
         return response.text

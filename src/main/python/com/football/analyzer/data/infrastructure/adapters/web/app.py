@@ -17,9 +17,13 @@ def create_app():
     db_connection = MongoDBConnectionAdapter()
     if not db_connection.connect():
         raise Exception("Failed to connect to MongoDB")
-    web_container_manager_dates = WebContainerManagerDates(db_connection)
-    web_container_federation = WebContainerFederation(db_connection, app=app)
     notification_container = NotificationContainer()
+    web_container_manager_dates = WebContainerManagerDates(db_connection)
+    web_container_federation = WebContainerFederation(
+        db_connection,
+        notification_container,
+        app
+    )
     web_container_team = WebContainerTeam(
         db_connection,
         web_container_manager_dates,

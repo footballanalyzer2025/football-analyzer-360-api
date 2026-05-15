@@ -59,16 +59,16 @@ class TelegramNotificationAdapter(NotificationPort):
 
     @staticmethod
     def _format_success_message(title: str, details: Dict[str, Any]) -> str:
-        lines = [f"✅ <b>{title}</b>"]
+        lines = [f"✅ <b>{title}</b>", ""]
         for key, value in details.items():
-            lines.append(f"• {key}: {value}")
+            lines.append(f"▫️ {key}: {value}")
         return "\n".join(lines)
 
     @staticmethod
     def _format_error_message(title: str, error: Exception, context: Dict[str, Any]) -> str:
-        lines = [f"❌ <b>{title}</b>", f"Error: {str(error)}"]
+        lines = [f"❌ <b>{title}</b>", f"Error: {str(error)}", ""]
         if context:
             lines.append("\nContexto:")
             for key, value in context.items():
-                lines.append(f"• {key}: {value}")
+                lines.append(f"▫️ {key}: {value}")
         return "\n".join(lines)

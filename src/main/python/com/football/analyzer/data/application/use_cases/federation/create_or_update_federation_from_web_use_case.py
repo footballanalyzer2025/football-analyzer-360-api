@@ -1,5 +1,3 @@
-# application/use_cases/federation/create_or_update_federation_from_web_use_case.py
-
 import copy
 import logging
 import threading
@@ -15,6 +13,7 @@ from ....domain.ports.repositories.federation_repository_port import FederationR
 from ....infrastructure.adapters.services.web_scrapping_competitions_by_federations_data_source_adapter import (
     WebScrappingCompetitionsByFederationsDataSourceAdapter
 )
+from ....application.services.notification_service import NotificationService
 
 logger = logging.getLogger(__name__)
 
@@ -27,9 +26,15 @@ class CreateOrUpdateFederationFromWebResult:
 
 class CreateOrUpdateFederationFromWebUseCase:
 
-    def __init__(self, federation_repository: FederationRepositoryPort, app=None):
+    def __init__(
+        self,
+        federation_repository: FederationRepositoryPort,
+        notification_service: NotificationService,
+        app=None
+    ):
         self._config_loader = ConfigLoader()
         self._federation_repository = federation_repository
+        self._notification_service = notification_service
         self._scraping_adapter = WebScrappingCompetitionsByFederationsDataSourceAdapter()
         self._app = app
 
@@ -50,9 +55,21 @@ class CreateOrUpdateFederationFromWebUseCase:
                         self._federation_repository.save_federation(
                             federation_name, self._prepare_document(federation_data)
                         )
-                    logger.info(f"Background task completed. Processed {len(scraped_data)} federations")
+                    self._notification_service.send_success(
+                        "Federations Scraping Success",
+                        {
+                            "Federations processed": len(scraped_data),
+                            "Competitions": len(dto.competitions_by_federation)
+                        }
+                    )
                 except Exception as e:
-                    logger.error(f"Background task failed: {e}")
+                    self._notification_service.send_error(
+                        "Federations Scraping Error",
+                        e,
+                        {
+                            "competitions_by_federation": len(dto.competitions_by_federation)
+                        }
+                    )
 
         thread = threading.Thread(target=background_task)
         thread.start()

@@ -64,8 +64,8 @@ class CreateTeamsFromWebUseCase:
                     self._notification_service.send_success(
                         "Teams Scraping Success",
                         {
-                            "Teams processed": len(teams_data),
-                            "Competitions": len(dto.competitions_by_federation)
+                            "Number of Competitions": len(dto.competitions_by_federation),
+                            "Teams processed": len(teams_data)
                         }
                     )
                 except Exception as e:
@@ -73,7 +73,7 @@ class CreateTeamsFromWebUseCase:
                         "Teams Scraping Error",
                         e,
                         {
-                            "competitions_by_federation": dto.competitions_by_federation
+                            "Number of Competitions": len(dto.competitions_by_federation)
                         }
                     )
 
