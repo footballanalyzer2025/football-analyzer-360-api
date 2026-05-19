@@ -124,3 +124,5 @@ def init_routes(web_container_federation: WebContainerFederation):
             'success': result.success,
             'message': result.message
         }), status_code
+
+    return federation_bp
