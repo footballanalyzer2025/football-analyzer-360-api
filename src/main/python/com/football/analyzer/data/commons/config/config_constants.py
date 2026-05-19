@@ -13,7 +13,6 @@ class ConfigConstants:
     TEAMS_SECTIONS = "TEAMS_SECTIONS"
     DATES_AND_RESULTS_SECTION = "DATES_AND_RESULTS_SECTION"
     H2H_SECTION = "H2H_SECTION"
-    CALENDARS_BY_FEDERATION_AND_COMPETITIONS = "calendars_by_federation_and_competitions"
 
     # ========================================================================== #
     #                      SELECTORS KEYS IN CONFIG.INI                          #
@@ -103,3 +102,10 @@ class ConfigConstants:
     TELEGRAM = 'TELEGRAM'
     TOKEN = 'TOKEN'
     CHAT_ID = 'CHAT_ID'
+
+    # ========================================================================== #
+    #                                REQUESTS BODY                               #
+    # ========================================================================== #
+
+    CALENDARS_BY_FEDERATION_AND_COMPETITIONS = "calendars_by_federation_and_competitions"
+    STATS_BY_FEDERATION_AND_COMPETITIONS = "stats_by_federation_and_competitions"
