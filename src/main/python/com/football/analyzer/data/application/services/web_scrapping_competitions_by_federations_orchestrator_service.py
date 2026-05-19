@@ -97,7 +97,6 @@ class WebScrappingCompetitionsByFederationsOrchestratorService:
                 )
             }
 
-    # def _enriched_competitions_data_with_teams_section(self, competition_name, competition_sections, competitions_data, with_matches):
     def _enriched_competitions_data_with_teams_section(self, competition_name, competition_sections, competitions_data):
         teams_section = self.config_loader.get_teams_section()
         if teams_section in competition_sections:

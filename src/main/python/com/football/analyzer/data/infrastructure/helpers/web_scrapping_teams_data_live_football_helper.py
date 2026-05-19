@@ -27,8 +27,7 @@ class WebScrappingTeamsDataLiveFootballHelper:
         self.team_matches_helper = WebScrappingTeamMatchesDataLiveFootballHelper(
             self._main_helper,
             self._calendar_helper,
-            self._config_loader,
-            managers_data
+            self._config_loader
         )
 
     def get_teams_data(self, teams_data: Dict) -> Dict:
@@ -53,6 +52,7 @@ class WebScrappingTeamsDataLiveFootballHelper:
                 }
             }
             result[team_name][ConfigConstants.MATCHES] = self.team_matches_helper.get_team_matches_data(
+                team_name,
                 result[team_name][ConfigConstants.SECTIONS][dates_section][ConfigConstants.MAIN_URL],
                 self._managers_data[team_name]
             )

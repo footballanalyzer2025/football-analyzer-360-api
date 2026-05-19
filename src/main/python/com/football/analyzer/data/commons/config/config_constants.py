@@ -62,7 +62,6 @@ class ConfigConstants:
     LIMIT_APPLIED = 'limit_applied'
 
     ALL_MATCHES = 'all_matches'
-    AWAY = 'away'
     AWAY_TEAM = 'away_team'
     COMPETITION_NAME = "competition_name"
     DATE = 'date'
@@ -74,7 +73,6 @@ class ConfigConstants:
     WAS_CANCELED = 'was_canceled'
     HAS_EXTRA_TIME = 'has_extra_time'
     HAS_PENALTIES = 'has_penalties'
-    HOME = 'home'
     HOME_TEAM = 'home_team'
     MATCH_LINK = 'match_link'
     NAME = 'name'

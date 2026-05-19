@@ -65,12 +65,10 @@ class WebScrappingCalendarDataLiveFootballHelper:
     def _extract_match_from_calendar(self, match_element: Tag, competition_name: str) -> Optional[Dict]:
         date_element = match_element.find_previous_sibling(class_='match-date')
         match_date = date_element.get_text(strip=True) if date_element else ""
-        home_team_element = match_element.find(class_='team-name-home')
-        home_team = home_team_element.get_text(strip=True) if home_team_element else ""
-        away_team_element = match_element.find(class_='team-name-away')
-        away_team = away_team_element.get_text(strip=True) if away_team_element else ""
+        home_team = self._get_team_name(match_element, 'team-name-home')
+        away_team = self._get_team_name(match_element, 'team-name-away')
         result_tag = match_element.find(class_='match-result')
-        result = self.parse_match_result(result_tag, False) if result_tag else {}
+        result = self.parse_match_result(result_tag, home_team, away_team) if result_tag else {}
         match_link_tag = None
         if result_tag:
             match_link_tag = result_tag.find('a')
@@ -93,6 +91,11 @@ class WebScrappingCalendarDataLiveFootballHelper:
             ConfigConstants.COMPETITION_NAME: competition_name
         }
 
+    @staticmethod
+    def _get_team_name(match_element, class_value):
+        team_element = match_element.find(class_=class_value)
+        return team_element.get_text(strip=True) if team_element else ""
+
     def _determine_match_status(self, is_finished: bool, is_upcoming: bool, match_link_tag) -> str:
         if is_finished:
             return self._config_loader.get_selector(ConfigConstants.STATUS_MATCH_FINISHED_SELECTOR)
@@ -107,8 +110,8 @@ class WebScrappingCalendarDataLiveFootballHelper:
             return self._config_loader.get_selector(ConfigConstants.STATUS_MATCH_UPCOMING_SELECTOR)
         return self._config_loader.get_selector(ConfigConstants.STATUS_MATCH_FINISHED_SELECTOR)
 
-    def parse_match_result(self, result_match_data: Tag, is_away_venue: bool) -> Dict:
-        result = self._init_result()
+    def parse_match_result(self, result_match_data: Tag, left_team: str, right_team: str) -> Dict:
+        result = self._init_result(left_team, right_team)
         text = result_match_data.text.strip()
         if text in ConfigConstants.NONE_RESULTS:
             return result
@@ -122,70 +125,70 @@ class WebScrappingCalendarDataLiveFootballHelper:
         if not a_tags:
             return result
         if has_penalties:
-            return self._parse_penalties_match(result, scores_by_period_list)
+            return self._parse_penalties_match(result, scores_by_period_list, left_team, right_team)
         if has_extra_time:
-            return self._parse_extra_time_match(result, scores_by_period_list)
-        return self._parse_normal_match(result, scores_by_period_list)
+            return self._parse_extra_time_match(result, scores_by_period_list, left_team, right_team)
+        return self._parse_normal_match(result, scores_by_period_list, left_team, right_team)
 
     @staticmethod
-    def _init_result():
+    def _init_result(left_team: str, right_team: str):
         return {
-            ConfigConstants.FIRST_HALF: {ConfigConstants.HOME: 0, ConfigConstants.AWAY: 0},
-            ConfigConstants.SECOND_HALF: {ConfigConstants.HOME: 0, ConfigConstants.AWAY: 0},
-            ConfigConstants.FULL_TIME: {ConfigConstants.HOME: 0, ConfigConstants.AWAY: 0},
+            ConfigConstants.FIRST_HALF: {left_team: 0, right_team: 0},
+            ConfigConstants.SECOND_HALF: {left_team: 0, right_team: 0},
+            ConfigConstants.FULL_TIME: {left_team: 0, right_team: 0},
             ConfigConstants.WAS_CANCELED: False,
             ConfigConstants.HAS_EXTRA_TIME: False,
-            ConfigConstants.EXTRA_TIME: {ConfigConstants.HOME: 0, ConfigConstants.AWAY: 0},
-            ConfigConstants.FULL_EXTRA_TIME: {ConfigConstants.HOME: 0, ConfigConstants.AWAY: 0},
+            ConfigConstants.EXTRA_TIME: {left_team: 0, right_team: 0},
+            ConfigConstants.FULL_EXTRA_TIME: {left_team: 0, right_team: 0},
             ConfigConstants.HAS_PENALTIES: False,
-            ConfigConstants.PENALTIES: {ConfigConstants.HOME: 0, ConfigConstants.AWAY: 0}
+            ConfigConstants.PENALTIES: {left_team: 0, right_team: 0}
         }
 
-    def _parse_penalties_match(self, result: Dict, scores_by_period_list: List) -> Dict:
+    def _parse_penalties_match(self, result: Dict, scores_by_period_list: List, left_team: str, right_team: str) -> Dict:
         result[ConfigConstants.HAS_PENALTIES] = True
-        result[ConfigConstants.PENALTIES] = self._get_score_at_period(scores_by_period_list[0], ConfigConstants.HOME, ConfigConstants.AWAY)
+        result[ConfigConstants.PENALTIES] = self._get_score_at_period(scores_by_period_list[0], left_team, right_team)
         if len(scores_by_period_list) == 4:
             result[ConfigConstants.HAS_EXTRA_TIME] = True
-            return self._parse_penalties_with_extra_time(result, scores_by_period_list)
+            return self._parse_penalties_with_extra_time(result, scores_by_period_list, left_team, right_team)
         if len(scores_by_period_list) == 3:
-            return self._parse_penalties_without_extra_time(result, scores_by_period_list)
+            return self._parse_penalties_without_extra_time(result, scores_by_period_list, left_team, right_team)
         return result
 
-    def _parse_penalties_with_extra_time(self, result: Dict, scores_by_period_list: List) -> Dict:
-        result[ConfigConstants.FIRST_HALF] = self._get_score_at_period(scores_by_period_list[1], ConfigConstants.HOME, ConfigConstants.AWAY)
-        result[ConfigConstants.FULL_TIME] = self._get_score_at_period(scores_by_period_list[2], ConfigConstants.HOME, ConfigConstants.AWAY)
-        result[ConfigConstants.SECOND_HALF] = self._get_score_calculate_at_period(result, ConfigConstants.FULL_TIME, ConfigConstants.FIRST_HALF, ConfigConstants.HOME, ConfigConstants.AWAY)
-        result[ConfigConstants.FULL_EXTRA_TIME] = self._get_score_at_period(scores_by_period_list[3], ConfigConstants.HOME, ConfigConstants.AWAY)
-        result[ConfigConstants.EXTRA_TIME] = self._get_score_calculate_at_period(result, ConfigConstants.FULL_EXTRA_TIME, ConfigConstants.FULL_TIME, ConfigConstants.HOME, ConfigConstants.AWAY)
+    def _parse_penalties_with_extra_time(self, result: Dict, scores_by_period_list: List, left_team: str, right_team: str) -> Dict:
+        result[ConfigConstants.FIRST_HALF] = self._get_score_at_period(scores_by_period_list[1], left_team, right_team)
+        result[ConfigConstants.FULL_TIME] = self._get_score_at_period(scores_by_period_list[2], left_team, right_team)
+        result[ConfigConstants.SECOND_HALF] = self._get_score_calculate_at_period(result, ConfigConstants.FULL_TIME, ConfigConstants.FIRST_HALF, left_team, right_team)
+        result[ConfigConstants.FULL_EXTRA_TIME] = self._get_score_at_period(scores_by_period_list[3], left_team, right_team)
+        result[ConfigConstants.EXTRA_TIME] = self._get_score_calculate_at_period(result, ConfigConstants.FULL_EXTRA_TIME, ConfigConstants.FULL_TIME, left_team, right_team)
         return result
 
-    def _parse_penalties_without_extra_time(self, result: Dict, scores_by_period_list: List) -> Dict:
-        result[ConfigConstants.FIRST_HALF] = self._get_score_at_period(scores_by_period_list[1], ConfigConstants.HOME, ConfigConstants.AWAY)
-        result[ConfigConstants.FULL_TIME] = self._get_score_at_period(scores_by_period_list[2], ConfigConstants.HOME, ConfigConstants.AWAY)
-        result[ConfigConstants.SECOND_HALF] = self._get_score_calculate_at_period(result, ConfigConstants.FULL_TIME, ConfigConstants.FIRST_HALF, ConfigConstants.HOME, ConfigConstants.AWAY)
+    def _parse_penalties_without_extra_time(self, result: Dict, scores_by_period_list: List, left_team: str, right_team: str) -> Dict:
+        result[ConfigConstants.FIRST_HALF] = self._get_score_at_period(scores_by_period_list[1], left_team, right_team)
+        result[ConfigConstants.FULL_TIME] = self._get_score_at_period(scores_by_period_list[2], left_team, right_team)
+        result[ConfigConstants.SECOND_HALF] = self._get_score_calculate_at_period(result, ConfigConstants.FULL_TIME, ConfigConstants.FIRST_HALF, left_team, right_team)
         return result
 
-    def _parse_extra_time_match(self, result: Dict, scores_by_period_list: List) -> Dict:
+    def _parse_extra_time_match(self, result: Dict, scores_by_period_list: List, left_team: str, right_team: str) -> Dict:
         result[ConfigConstants.HAS_EXTRA_TIME] = True
         if len(scores_by_period_list) >= 3:
-            result[ConfigConstants.FIRST_HALF] = self._get_score_at_period(scores_by_period_list[1], ConfigConstants.HOME, ConfigConstants.AWAY)
-            result[ConfigConstants.FULL_TIME] = self._get_score_at_period(scores_by_period_list[2], ConfigConstants.HOME, ConfigConstants.AWAY)
-            result[ConfigConstants.SECOND_HALF] = self._get_score_calculate_at_period(result, ConfigConstants.FULL_TIME, ConfigConstants.FIRST_HALF, ConfigConstants.HOME, ConfigConstants.AWAY)
+            result[ConfigConstants.FIRST_HALF] = self._get_score_at_period(scores_by_period_list[1], left_team, right_team)
+            result[ConfigConstants.FULL_TIME] = self._get_score_at_period(scores_by_period_list[2], left_team, right_team)
+            result[ConfigConstants.SECOND_HALF] = self._get_score_calculate_at_period(result, ConfigConstants.FULL_TIME, ConfigConstants.FIRST_HALF, left_team, right_team)
             if len(scores_by_period_list) >= 4:
-                result[ConfigConstants.FULL_EXTRA_TIME] = self._get_score_at_period(scores_by_period_list[0], ConfigConstants.HOME, ConfigConstants.AWAY)
-                result[ConfigConstants.EXTRA_TIME] = self._get_score_at_period(scores_by_period_list[3], ConfigConstants.HOME, ConfigConstants.AWAY)
+                result[ConfigConstants.FULL_EXTRA_TIME] = self._get_score_at_period(scores_by_period_list[0], left_team, right_team)
+                result[ConfigConstants.EXTRA_TIME] = self._get_score_at_period(scores_by_period_list[3], left_team, right_team)
             else:
-                result[ConfigConstants.FULL_EXTRA_TIME] = self._get_score_at_period(scores_by_period_list[0], ConfigConstants.HOME, ConfigConstants.AWAY)
-                result[ConfigConstants.EXTRA_TIME] = self._get_score_calculate_at_period(result, ConfigConstants.FULL_EXTRA_TIME, ConfigConstants.FULL_TIME, ConfigConstants.HOME, ConfigConstants.AWAY)
+                result[ConfigConstants.FULL_EXTRA_TIME] = self._get_score_at_period(scores_by_period_list[0], left_team, right_team)
+                result[ConfigConstants.EXTRA_TIME] = self._get_score_calculate_at_period(result, ConfigConstants.FULL_EXTRA_TIME, ConfigConstants.FULL_TIME, left_team, right_team)
         return result
 
-    def _parse_normal_match(self, result: Dict, scores_by_period_list: List) -> Dict:
+    def _parse_normal_match(self, result: Dict, scores_by_period_list: List, left_team: str, right_team: str) -> Dict:
         if len(scores_by_period_list) >= 2:
-            result[ConfigConstants.FIRST_HALF] = self._get_score_at_period(scores_by_period_list[1], ConfigConstants.HOME, ConfigConstants.AWAY)
-            result[ConfigConstants.FULL_TIME] = self._get_score_at_period(scores_by_period_list[0], ConfigConstants.HOME, ConfigConstants.AWAY)
-            result[ConfigConstants.SECOND_HALF] = self._get_score_calculate_at_period(result, ConfigConstants.FULL_TIME, ConfigConstants.FIRST_HALF, ConfigConstants.HOME, ConfigConstants.AWAY)
+            result[ConfigConstants.FIRST_HALF] = self._get_score_at_period(scores_by_period_list[1], left_team, right_team)
+            result[ConfigConstants.FULL_TIME] = self._get_score_at_period(scores_by_period_list[0], left_team, right_team)
+            result[ConfigConstants.SECOND_HALF] = self._get_score_calculate_at_period(result, ConfigConstants.FULL_TIME, ConfigConstants.FIRST_HALF, left_team, right_team)
         elif len(scores_by_period_list) == 1:
-            result[ConfigConstants.FULL_TIME] = self._get_score_at_period(scores_by_period_list[0], ConfigConstants.HOME, ConfigConstants.AWAY)
+            result[ConfigConstants.FULL_TIME] = self._get_score_at_period(scores_by_period_list[0], left_team, right_team)
         return result
 
     @staticmethod

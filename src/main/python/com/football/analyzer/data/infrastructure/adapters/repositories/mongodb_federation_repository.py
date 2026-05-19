@@ -39,7 +39,7 @@ class MongoDBFederationRepository(FederationRepositoryPort):
                 existing = collection.find_one({ConfigConstants.NAME: federation_name})
                 if existing and ConfigConstants.TEAMS_DATA in existing and ConfigConstants.TEAMS_DATA not in federation_data:
                     federation_data[ConfigConstants.TEAMS_DATA] = existing.get(ConfigConstants.TEAMS_DATA, {})
-                result = collection.update_one(
+                collection.update_one(
                     {ConfigConstants.NAME: federation_name},
                     {'$set': federation_data}
                 )

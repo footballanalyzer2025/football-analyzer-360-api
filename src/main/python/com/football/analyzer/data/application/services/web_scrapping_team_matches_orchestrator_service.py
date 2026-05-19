@@ -22,8 +22,7 @@ class WebScrappingTeamMatchesOrchestratorService:
         self._team_matches_helper = WebScrappingTeamMatchesDataLiveFootballHelper(
             _main_helper,
             _calendar_helper,
-            self._config_loader,
-            managers_data
+            self._config_loader
         )
         self._managers_data = managers_data
 
@@ -33,6 +32,7 @@ class WebScrappingTeamMatchesOrchestratorService:
             result[team_name] = team_data
             if ConfigConstants.SECTIONS in team_data:
                 result[team_name][ConfigConstants.MATCHES] = self._team_matches_helper.get_team_matches_data(
+                    team_name,
                     team_data[ConfigConstants.SECTIONS][self._config_loader.get_dates_and_results_section()][ConfigConstants.MAIN_URL],
                     self._managers_data[team_name]
                 )

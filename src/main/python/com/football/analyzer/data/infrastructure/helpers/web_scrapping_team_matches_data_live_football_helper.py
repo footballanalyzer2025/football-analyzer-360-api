@@ -16,15 +16,14 @@ class WebScrappingTeamMatchesDataLiveFootballHelper:
             self,
             main_helper: WebScrappingMainDataLiveFootballHelper,
             calendar_helper: WebScrappingCalendarDataLiveFootballHelper,
-            config_loader: ConfigLoader,
-            managers_data
+            config_loader: ConfigLoader
     ):
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self._main_helper = main_helper
         self._calendar_helper = calendar_helper
         self._config_loader = config_loader
 
-    def get_team_matches_data(self, team_matches_url: str, manager_start_date: str) -> Dict:
+    def get_team_matches_data(self, team_name: str, team_matches_url: str, manager_start_date: str) -> Dict:
         all_sessions = self._main_helper.get_main_data(
             team_matches_url,
             self._config_loader.get_selector(ConfigConstants.SESSIONS_SELECT_TEAM_SELECTOR),
@@ -38,7 +37,7 @@ class WebScrappingTeamMatchesDataLiveFootballHelper:
         first_session = next(iter(all_sessions))
         sessions_filter = self._get_season_filter(first_session, manager_start_date)
         filtered_sessions = self._main_helper.apply_filter(all_sessions, sessions_filter, True)
-        return self._get_games_by_team_data(filtered_sessions)
+        return self._get_games_by_team_data(team_name, filtered_sessions)
 
     @staticmethod
     def _get_season_filter(session_type: str, init_date: str) -> List:
@@ -50,13 +49,13 @@ class WebScrappingTeamMatchesDataLiveFootballHelper:
         end_year = int(session_type)
         return [str(year) for year in range(init_dt.year, end_year + 1)]
 
-    def _get_games_by_team_data(self, sessions_by_team_full_url_filtered: Dict) -> Dict:
+    def _get_games_by_team_data(self, team_name: str, sessions_by_team_full_url_filtered: Dict) -> Dict:
         games_by_team_data = {}
         for session, session_data in sessions_by_team_full_url_filtered.items():
             all_rows = self._main_helper.get_html_soup(session_data[ConfigConstants.MAIN_URL]).select(
                 self._config_loader.get_selector(ConfigConstants.MATCHES_LIST_SELECTOR)
             )
-            self._process_match_rows(all_rows, session, games_by_team_data)
+            self._process_match_rows(team_name, all_rows, session, games_by_team_data)
         all_matches = []
         for sessions_by_competition in games_by_team_data.values():
             for matches_at_session in sessions_by_competition.values():
@@ -68,7 +67,7 @@ class WebScrappingTeamMatchesDataLiveFootballHelper:
         games_by_team_data[ConfigConstants.ALL_MATCHES] = all_matches
         return games_by_team_data
 
-    def _process_match_rows(self, all_rows: List[Tag], session: str, games_by_team_data: Dict) -> None:
+    def _process_match_rows(self, team_name: str, all_rows: List[Tag], session: str, games_by_team_data: Dict) -> None:
         current_tournament = None
         for row in all_rows:
             row_class = row.get(self._config_loader.get_selector(ConfigConstants.CLASS_SELECTOR))
@@ -76,7 +75,7 @@ class WebScrappingTeamMatchesDataLiveFootballHelper:
                 current_tournament = self._extract_tournament_name(row)
                 self._initialize_tournament_session(games_by_team_data, current_tournament, session)
             elif self._is_match_row(row_class) and current_tournament:
-                self._add_match_to_tournament(games_by_team_data, current_tournament, session, row)
+                self._add_match_to_tournament(team_name, games_by_team_data, current_tournament, session, row)
 
     def _is_competition_head_row(self, row_class: List) -> bool:
         return self._config_loader.get_selector(ConfigConstants.ROW_CLASS_COMPETITION_HEAD_SELECTOR) in row_class
@@ -101,6 +100,7 @@ class WebScrappingTeamMatchesDataLiveFootballHelper:
 
     def _add_match_to_tournament(
             self,
+            team_name: str,
             games_by_team_data: Dict,
             tournament: str,
             session: str,
@@ -108,20 +108,18 @@ class WebScrappingTeamMatchesDataLiveFootballHelper:
     ) -> None:
         if session not in games_by_team_data[tournament]:
             games_by_team_data[tournament][session] = []
-        match_data = self._extract_match_data(row, tournament)
+        match_data = self._extract_match_data(team_name, row, tournament)
         if match_data:
             games_by_team_data[tournament][session].append(match_data)
 
-    def _extract_match_data(self, row: Tag, tournament: str) -> Optional[Dict]:
+    def _extract_match_data(self, team_name: str, row: Tag, tournament: str) -> Optional[Dict]:
         selectors = self._get_match_selectors()
         match_date = row.select_one(selectors[ConfigConstants.DATE])
         venue_tag = row.select_one(selectors[ConfigConstants.VENUE])
         venue = venue_tag.text.strip() if venue_tag else ""
-        opponent = row.select_one(selectors[ConfigConstants.OPPONENT])
+        opponent = self._get_opponent(row, selectors)
         result_tag = row.select_one(selectors[ConfigConstants.RESULT])
-        match_result = self._calendar_helper.parse_match_result(result_tag, True if venue == 'A' else False) if result_tag else {}
-        full_result_tag = row.select_one(selectors[ConfigConstants.RESULT_TENDENCY])
-        full_result = full_result_tag.text.strip() if full_result_tag else ""
+        match_result = self._calendar_helper.parse_match_result(result_tag, team_name, opponent) if result_tag else {}
         match_link = row.select_one(selectors[ConfigConstants.MATCH_LINK])
         row_class = row.get(self._config_loader.get_selector(ConfigConstants.CLASS_SELECTOR))
         is_finished = self._config_loader.get_selector(ConfigConstants.STATUS_MATCH_FINISHED_SELECTOR) in row_class
@@ -129,7 +127,7 @@ class WebScrappingTeamMatchesDataLiveFootballHelper:
         return {
             ConfigConstants.DATE: match_date.text.strip() if match_date else "",
             ConfigConstants.VENUE: venue,
-            ConfigConstants.OPPONENT: opponent.text.strip() if opponent else "",
+            ConfigConstants.OPPONENT: opponent,
             ConfigConstants.RESULT: match_result,
             ConfigConstants.MATCH_LINK: self._main_helper.get_full_clean_url(
                 self._config_loader.get_data_source_url().rstrip(ConfigConstants.SLASH),
@@ -149,3 +147,8 @@ class WebScrappingTeamMatchesDataLiveFootballHelper:
             ConfigConstants.RESULT_TENDENCY: self._config_loader.get_selector(ConfigConstants.ROW_TD_MATCH_RESULT_TENDENCY_SELECTOR),
             ConfigConstants.MATCH_LINK: self._config_loader.get_selector(ConfigConstants.ROW_TD_MATCH_RESULT_ALL_A_SELECTOR)
         }
+
+    @staticmethod
+    def _get_opponent(row, selectors):
+        opponent = row.select_one(selectors[ConfigConstants.OPPONENT])
+        return opponent.text.strip() if opponent else ""
