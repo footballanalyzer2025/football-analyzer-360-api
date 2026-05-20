@@ -61,10 +61,12 @@ class GetUpcomingMatchesUseCase:
             number_of_teams = comp_data.get(ConfigConstants.NUMBER_OF_TEAMS, NUMBER_OF_TEAMS_DEFAULT)
             limit = max(MIN_LIMIT, (number_of_teams // GAMES_BY_TOTAL_TEAMS) * PROJECTION_GAMES) if number_of_teams > NUMBER_OF_TEAMS_DEFAULT else NUMBER_OF_TEAMS_DEFAULT
             limited_matches = upcoming_matches[:limit]
+            results_and_standings_section = self._config_loader.get_results_and_standings_section()
             fed_result[comp_name] = {
                 ConfigConstants.UPCOMING_MATCHES: limited_matches,
                 ConfigConstants.TOTAL_UPCOMING: len(limited_matches),
                 ConfigConstants.LIMIT_APPLIED: limit,
-                ConfigConstants.NUMBER_OF_TEAMS: number_of_teams
+                ConfigConstants.NUMBER_OF_TEAMS: number_of_teams,
+                results_and_standings_section: comp_data.get(results_and_standings_section, {})
             }
         return fed_result

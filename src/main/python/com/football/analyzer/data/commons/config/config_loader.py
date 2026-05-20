@@ -43,6 +43,9 @@ class ConfigLoader(metaclass=SingletonMeta):
         filter_str = self.all_config_ini[self.constants.LIVE_FOOTBALL_INFORMATION][self.constants.TEAMS_SECTIONS]
         return [item.strip() for item in filter_str.split(',') if item.strip()]
 
+    def get_fifa_world_ranking_url_special_case(self) -> dict:
+        return self.all_config_ini[self.constants.FIFA][self.constants.WORLD_RANKING_URL]
+
     def get_telegram_config(self) -> dict:
         return {
             self.constants.TOKEN: self.all_config_ini[self.constants.TELEGRAM][self.constants.TOKEN],

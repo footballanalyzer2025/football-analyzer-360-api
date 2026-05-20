@@ -98,8 +98,8 @@ class CreateTeamsFromWebUseCase:
         result = {}
         for federation, competitions in competitions_by_federation.items():
             result[federation] = []
-            for competition_name, value in competitions.items():
-                if value == "ALL" or isinstance(value, list):
+            for competition_name, competition_data in competitions.items():
+                if competition_data == "ALL" or isinstance(competition_data, list):
                     result[federation].append(competition_name)
         return result
 

@@ -68,8 +68,10 @@ class GetCalendarsUseCase:
         for comp_name in competition_names:
             comp_data = competitions_data.get(comp_name, {})
             calendar_section = self._config_loader.get_calendar_section()
+            results_and_standings_section = self._config_loader.get_results_and_standings_section()
             fed_result[comp_name] = {
                 calendar_section: comp_data.get(calendar_section, {}),
-                ConfigConstants.NUMBER_OF_TEAMS: len(comp_data.get(self._config_loader.get_teams_section(), {}))
+                ConfigConstants.NUMBER_OF_TEAMS: len(comp_data.get(self._config_loader.get_teams_section(), {})),
+                results_and_standings_section: comp_data.get(results_and_standings_section, {})
             }
         return fed_result

@@ -3,6 +3,8 @@ class ConfigConstants:
     # ========================================================================== #
     #                           KEYS IN CONFIG.INI                               #
     # ========================================================================== #
+    #                              LIVE FOOTBALL                                 #
+    # ========================================================================== #
     LIVE_FOOTBALL_INFORMATION = "LIVE_FOOTBALL_INFORMATION"
     URL_MAIN = "URL_MAIN"
     COUNTRIES_AND_FEDERATIONS = "COUNTRIES_AND_FEDERATIONS"
@@ -13,6 +15,11 @@ class ConfigConstants:
     TEAMS_SECTIONS = "TEAMS_SECTIONS"
     DATES_AND_RESULTS_SECTION = "DATES_AND_RESULTS_SECTION"
     H2H_SECTION = "H2H_SECTION"
+    # ========================================================================== #
+    #                    LIVE FOOTBALL FIFA (Special Case)                       #
+    # ========================================================================== #
+    FIFA = "FIFA"
+    WORLD_RANKING_URL = "WORLD_RANKING_URL"
 
     # ========================================================================== #
     #                      SELECTORS KEYS IN CONFIG.INI                          #
@@ -38,6 +45,7 @@ class ConfigConstants:
     ROW_TD_TEAM_SHORTNAME_EXTENDED_A_SELECTOR = "ROW_TD_MATCH_SHORTNAME_EXTENDED_A"
     STATUS_MATCH_FINISHED_SELECTOR = "STATUS_MATCH_FINISHED"
     STATUS_MATCH_UPCOMING_SELECTOR = "STATUS_MATCH_UPCOMING"
+    STATUS_MATCH_TO_ANALYZE = "STATUS_MATCH_TO_ANALYZE"
 
     # ========================================================================== #
     #                      KEYS COMPETITIONS AND MATCHES                         #
