@@ -33,7 +33,7 @@ def create_app():
         notification_container,
         app
     )
-    web_container_stats = WebContainerStats(web_container_federation)
+    web_container_stats = WebContainerStats(web_container_federation, web_container_team)
     manager_date_bp = init_manager_routes(web_container_manager_dates)
     federation_bp = init_federation_routes(web_container_federation)
     team_bp = init_team_routes(web_container_team)
