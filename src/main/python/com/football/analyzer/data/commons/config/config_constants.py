@@ -96,6 +96,7 @@ class ConfigConstants:
     TEAM_MATCHES = 'team_matches'
     CREATED_AT = 'created_at'
     UPDATE_AT = 'updated_at'
+    STATS = 'stats'
 
     HEADERS = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',

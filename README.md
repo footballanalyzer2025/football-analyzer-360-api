@@ -17,6 +17,7 @@ src/
                         │   │   ├── federation_request_dto.py
                         │   │   ├── manager_date_request_dto.py
                         │   │   ├── manager_date_response_dto.py
+                        │   │   ├── stats_request_dto.py
                         │   │   └── team_request_dto.py
                         │   ├── services/
                         │   │   ├── notification_service.py
@@ -37,6 +38,8 @@ src/
                         │       │   ├── delete_manager_date_use_case.py
                         │       │   ├── get_all_manager_dates_use_case.py
                         │       │   └── get_managers_date_use_case.py
+                        │       ├── stats/
+                        │       │   └── get_stats_use_case.py
                         │       └── team/
                         │           ├── create_teams_from_list_use_case.py
                         │           ├── create_teams_from_web_use_case.py
@@ -84,7 +87,6 @@ src/
                         │       └── notification_config.py
                         └── infrastructure/
                             ├── adapters/
-                            │   ├── api/
                             │   ├── database/
                             │   │   └── mongodb_connection_adapter.py
                             │   ├── exceptions/
@@ -113,11 +115,13 @@ src/
                             │       └── routes/
                             │           ├── federation_routes.py
                             │           ├── manager_date_routes.py
+                            │           ├── stats_routes.py
                             │           └── team_routes.py
                             ├── container/
                             │   ├── notification_container.py
                             │   ├── web_container_federation.py
                             │   ├── web_container_manager_dates.py
+                            │   ├── web_container_stats.py
                             │   ├── web_container_team.py
                             │   └── web_scrapping_data_source_container.py
                             └── helpers/
@@ -152,22 +156,22 @@ The project follows **Hexagonal Architecture (Ports & Adapters)** principles:
 
 ## 🚀 API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST   | `/federations/web-scrapping` | Start background scraping of federations/competitions |
-| GET    | `/federations` | Get specific federations by body payload |
-| GET    | `/federations/all` | Get all federations |
-| GET    | `/federations/calendars` | Get calendars for specific federations/competitions |
-| GET    | `/federations/upcoming-matches` | Get upcoming matches (limited by formula) |
-| DELETE | `/federations/<name>` | Delete a federation |
-| POST   | `/teams/web-scrapping/by-federation` | Start background scraping of teams from federations |
-| POST   | `/teams/web-scrapping/by-list` | Start background scraping of teams from a list |
-| GET    | `/teams/all` | Get all teams |
-| GET    | `/teams` | Get specific teams by body payload |
-| DELETE | `/teams/<name>` | Soft delete a team |
-| POST   | `/manager-dates` | Create/update manager start dates |
-| GET    | `/manager-dates/all` | Get all manager dates |
-| DELETE | `/manager-dates/<team>` | Delete a manager date entry |
+| Method | Endpoint                             | Description                                           |
+|--------|--------------------------------------|-------------------------------------------------------|
+| POST   | `/federations/web-scrapping`         | Start background scraping of federations/competitions |
+| GET    | `/federations`                       | Get specific federations by body payload              |
+| GET    | `/federations/all`                   | Get all federations                                   |
+| GET    | `/federations/calendars`             | Get calendars for specific federations/competitions   |
+| GET    | `/federations/upcoming-matches`      | Get upcoming matches (limited by formula)             |
+| DELETE | `/federations/<name>`                | Delete a federation                                   |
+| POST   | `/teams/web-scrapping/by-federation` | Start background scraping of teams from federations   |
+| POST   | `/teams/web-scrapping/by-list`       | Start background scraping of teams from a list        |
+| GET    | `/teams/all`                         | Get all teams                                         |
+| GET    | `/teams`                             | Get specific teams by body payload                    |
+| DELETE | `/teams/<name>`                      | Soft delete a team                                    |
+| POST   | `/manager-dates`                     | Create/update manager start dates                     |
+| GET    | `/manager-dates/all`                 | Get all manager dates                                 |
+| DELETE | `/manager-dates/<team>`              | Delete a manager date entry                           |
 
 ## 🔧 Configuration
 
@@ -189,17 +193,17 @@ Configuration is managed via `.ini` files:
 
 ## 📝 Design Patterns Implemented
 
-| Pattern          | Location        | Purpose                             |
-|------------------|-----------------|-------------------------------------|
-| **Strategy**     | `extractors/`   | Interchangeable HTML extraction strategies |
-| **Adapter**      | `adapters/`     | Adapt external interfaces to domain |
-| **Repository**   | `repositories/` | Abstract data access (MongoDB)      |
-| **Use Case**     | `use_cases/`    | Encapsulate business logic          |
-| **Orchestrator** | `services/`     | Coordinate complex scraping processes |
-| **Container**    | `container/`    | Dependency injection for use cases  |
-| **Singleton**    | `ConfigLoader`  | Single instance for configuration   |
-| **Factory**      | `create_app()`  | Flask application factory           |
-| **Notification** | `notifications/`| Multi-channel notifications (Strategy pattern) |
+| Pattern          | Location         | Purpose                                        |
+|------------------|------------------|------------------------------------------------|
+| **Strategy**     | `extractors/`    | Interchangeable HTML extraction strategies     |
+| **Adapter**      | `adapters/`      | Adapt external interfaces to domain            |
+| **Repository**   | `repositories/`  | Abstract data access (MongoDB)                 |
+| **Use Case**     | `use_cases/`     | Encapsulate business logic                     |
+| **Orchestrator** | `services/`      | Coordinate complex scraping processes          |
+| **Container**    | `container/`     | Dependency injection for use cases             |
+| **Singleton**    | `ConfigLoader`   | Single instance for configuration              |
+| **Factory**      | `create_app()`   | Flask application factory                      |
+| **Notification** | `notifications/` | Multi-channel notifications (Strategy pattern) |
 
 ## 📄 License
 
