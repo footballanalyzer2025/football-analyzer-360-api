@@ -87,13 +87,13 @@ class GetStatsUseCase:
             return False
         standings_url = self._get_standings_url(competition_data, federation)
         # TODO _get_competition_standing
-        self._get_competition_standing(standings_url)
+        standing_competition = self._get_competition_standing(standings_url)
         upcoming_matches = competition_data.get(ConfigConstants.UPCOMING_MATCHES, [])
         has_matches_to_analyze = False
         for match in upcoming_matches:
             if self._is_match_ready_for_analysis(match, all_teams):
                 self._mark_match_for_analysis(match)
-                self._get_stats_to_match(match, all_teams)
+                self._get_stats_to_match(match, all_teams, standing_competition)
                 has_matches_to_analyze = True
         return has_matches_to_analyze
 
@@ -120,10 +120,11 @@ class GetStatsUseCase:
         match[ConfigConstants.STATS] = {}
 
     @staticmethod
-    def _get_competition_standing(standings_url):
+    def _get_competition_standing(standings_url) -> Any:
         print(standings_url)
+        return None
 
     @staticmethod
-    def _get_stats_to_match(match: Dict[str, Any], all_teams: Dict[str, Dict[str, Any]]) -> None:
+    def _get_stats_to_match(match: Dict[str, Any], all_teams: Dict[str, Dict[str, Any]], standing_competition: Any) -> None:
         home_team_matches = all_teams[match[ConfigConstants.HOME_TEAM]][ConfigConstants.MATCHES][ConfigConstants.ALL_MATCHES]
         away_team_matches = all_teams[match[ConfigConstants.AWAY_TEAM]][ConfigConstants.MATCHES][ConfigConstants.ALL_MATCHES]
