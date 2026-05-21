@@ -117,4 +117,5 @@ class ConfigConstants:
     # ========================================================================== #
 
     CALENDARS_BY_FEDERATION_AND_COMPETITIONS = "calendars_by_federation_and_competitions"
+    STANDINGS_BY_FEDERATION_AND_COMPETITIONS = "standings_by_federation_and_competitions"
     STATS_BY_FEDERATION_AND_COMPETITIONS = "stats_by_federation_and_competitions"

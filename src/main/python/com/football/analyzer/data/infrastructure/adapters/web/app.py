@@ -2,12 +2,14 @@ from flask import Flask
 
 from .routes.federation_routes import init_routes as init_federation_routes
 from .routes.manager_date_routes import init_routes as init_manager_routes
+from .routes.standings_routes import init_routes as init_standings_routes
 from .routes.stats_routes import init_routes as init_stats_routes
 from .routes.team_routes import init_routes as init_team_routes
 from ..database.mongodb_connection_adapter import MongoDBConnectionAdapter
 from ...container.notification_container import NotificationContainer
 from ...container.web_container_federation import WebContainerFederation
 from ...container.web_container_manager_dates import WebContainerManagerDates
+from ...container.web_container_standings import WebContainerStandings
 from ...container.web_container_stats import WebContainerStats
 from ...container.web_container_team import WebContainerTeam
 
@@ -26,6 +28,7 @@ def create_app():
         notification_container,
         app
     )
+    web_container_standings = WebContainerStandings(web_container_federation.federation_repository)
     web_container_team = WebContainerTeam(
         db_connection,
         web_container_manager_dates,
@@ -36,10 +39,12 @@ def create_app():
     web_container_stats = WebContainerStats(web_container_federation, web_container_team)
     manager_date_bp = init_manager_routes(web_container_manager_dates)
     federation_bp = init_federation_routes(web_container_federation)
+    standings_bp = init_standings_routes(web_container_standings)
     team_bp = init_team_routes(web_container_team)
     stats_bp = init_stats_routes(web_container_stats)
     app.register_blueprint(manager_date_bp, url_prefix=FOOTBALL_ANALYZER_API_PATH_MAIN)
     app.register_blueprint(federation_bp, url_prefix=FOOTBALL_ANALYZER_API_PATH_MAIN)
+    app.register_blueprint(standings_bp, url_prefix=FOOTBALL_ANALYZER_API_PATH_MAIN)
     app.register_blueprint(team_bp, url_prefix=FOOTBALL_ANALYZER_API_PATH_MAIN)
     app.register_blueprint(stats_bp, url_prefix=FOOTBALL_ANALYZER_API_PATH_MAIN)
     return app

@@ -1,6 +1,7 @@
 import logging
 from typing import Dict, List
 
+from main.python.com.football.analyzer.data.infrastructure.container.web_scrapping_data_source_container import WebScrappingDataSourceContainer
 from src.main.python.com.football.analyzer.data.commons.config.config_constants import ConfigConstants
 from src.main.python.com.football.analyzer.data.commons.config.config_loader import ConfigLoader
 from src.main.python.com.football.analyzer.data.infrastructure.helpers.web_scrapping_calendar_data_live_football_helper import WebScrappingCalendarDataLiveFootballHelper
@@ -9,7 +10,7 @@ from src.main.python.com.football.analyzer.data.infrastructure.helpers.web_scrap
 
 class WebScrappingCompetitionsByFederationsOrchestratorService:
 
-    def __init__(self, web_scrapping_data_source_container):
+    def __init__(self, web_scrapping_data_source_container: WebScrappingDataSourceContainer):
         self.config_loader = ConfigLoader()
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.web_scrapping_data_source_container = web_scrapping_data_source_container
