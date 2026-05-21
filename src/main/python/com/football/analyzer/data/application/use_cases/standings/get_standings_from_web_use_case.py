@@ -30,7 +30,6 @@ class GetStandingsFromWebUseCase:
                 message=validation_error,
                 data={}
             )
-
         result = {}
         collection = self._federation_repository.get_collection()
         requested = dto.standings_by_federation_and_competitions
