@@ -48,9 +48,7 @@ class GetStandingsFromWebUseCase:
             competitions_data = federation_doc.get(ConfigConstants.COMPETITIONS_DATA, {})
             fed_result = {}
             for comp_name in competition_names:
-                comp_data = competitions_data.get(comp_name, {})
-                standings_url_data = comp_data.get(results_and_standings_section, {})
-                standings_main_url = standings_url_data.get(ConfigConstants.MAIN_URL, '') if isinstance(standings_url_data, dict) else ''
+                standings_main_url = self._get_standings_url(comp_name, competitions_data, federation_name, results_and_standings_section)
                 if standings_main_url:
                     standings_data = self._scraping_adapter.get_main_data({comp_name: standings_main_url})
                     fed_result[comp_name] = {
@@ -70,3 +68,11 @@ class GetStandingsFromWebUseCase:
             message=f"Retrieved standings for {len(result)} federations",
             data=result
         )
+
+    def _get_standings_url(self, comp_name, competitions_data, federation_name, results_and_standings_section):
+        comp_data = competitions_data.get(comp_name, {})
+        standings_url_data = comp_data.get(results_and_standings_section, {})
+        standings_main_url = standings_url_data.get(ConfigConstants.MAIN_URL, '') if isinstance(standings_url_data, dict) else ''
+        if ConfigConstants.FIFA == federation_name and ConfigConstants.WORLD_CUP == comp_name:
+            standings_main_url = self._config_loader.get_fifa_world_ranking_url_special_case()
+        return standings_main_url

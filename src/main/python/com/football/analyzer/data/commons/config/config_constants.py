@@ -19,6 +19,7 @@ class ConfigConstants:
     #                    LIVE FOOTBALL FIFA (Special Case)                       #
     # ========================================================================== #
     FIFA = "FIFA"
+    WORLD_CUP = "Copa Mundial"
     WORLD_RANKING_URL = "WORLD_RANKING_URL"
 
     # ========================================================================== #
