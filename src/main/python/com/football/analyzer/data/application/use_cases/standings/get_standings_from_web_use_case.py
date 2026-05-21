@@ -5,6 +5,8 @@ from typing import Dict, Any
 from ...dto.standings_request_dto import StandingsRequestDTO
 from ....commons.config.config_constants import ConfigConstants
 from ....commons.config.config_loader import ConfigLoader
+from ....domain.ports.repositories.federation_repository_port import FederationRepositoryPort
+from ....infrastructure.adapters.services.web_scrapping_standings_data_source_adapter import WebScrappingStandingsDataSourceAdapter
 
 logger = logging.getLogger(__name__)
 
@@ -18,9 +20,10 @@ class GetStandingsFromWebResult:
 
 class GetStandingsFromWebUseCase:
 
-    def __init__(self, federation_repository):
+    def __init__(self, federation_repository: FederationRepositoryPort):
         self._config_loader = ConfigLoader()
         self._federation_repository = federation_repository
+        self._scraping_adapter = WebScrappingStandingsDataSourceAdapter()
 
     def execute(self, dto: StandingsRequestDTO) -> GetStandingsFromWebResult:
         validation_error = dto.validate()
@@ -30,9 +33,9 @@ class GetStandingsFromWebUseCase:
                 message=validation_error,
                 data={}
             )
-        result = {}
         collection = self._federation_repository.get_collection()
         requested = dto.standings_by_federation_and_competitions
+        result = {}
         results_and_standings_section = self._config_loader.get_results_and_standings_section()
         for federation_name, competition_names in requested.items():
             federation_doc = collection.find_one(
@@ -46,10 +49,20 @@ class GetStandingsFromWebUseCase:
             fed_result = {}
             for comp_name in competition_names:
                 comp_data = competitions_data.get(comp_name, {})
-                standings_main_url = comp_data.get(results_and_standings_section, {})
-                fed_result[comp_name] = {
-                    results_and_standings_section: standings_main_url
-                }
+                standings_url_data = comp_data.get(results_and_standings_section, {})
+                standings_main_url = standings_url_data.get(ConfigConstants.MAIN_URL, '') if isinstance(standings_url_data, dict) else ''
+                if standings_main_url:
+                    standings_data = self._scraping_adapter.get_main_data({comp_name: standings_main_url})
+                    fed_result[comp_name] = {
+                        results_and_standings_section: standings_main_url,
+                        ConfigConstants.STANDINGS_DATA: standings_data
+                    }
+                else:
+                    fed_result[comp_name] = {
+                        results_and_standings_section: standings_main_url,
+                        ConfigConstants.STANDINGS_DATA: {}
+                    }
+                    logger.warning(f"No standings URL found for: {federation_name} - {comp_name}")
             if fed_result:
                 result[federation_name] = fed_result
         return GetStandingsFromWebResult(

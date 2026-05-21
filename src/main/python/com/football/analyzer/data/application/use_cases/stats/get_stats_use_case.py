@@ -4,10 +4,10 @@ from typing import Dict, Any, List
 
 from main.python.com.football.analyzer.data.commons.config.config_constants import ConfigConstants
 from main.python.com.football.analyzer.data.commons.config.config_loader import ConfigLoader
+from ..calendar.get_upcoming_matches_of_calendars_use_case import GetUpcomingMatchesUseCase
 from ..team.get_all_teams_use_case import GetAllTeamsUseCase
 from ...dto.federation_request_dto import GetCalendarsRequestDTO
 from ...dto.stats_request_dto import StatsRequestDTO
-from ..calendar.get_upcoming_matches_of_calendars_use_case import GetUpcomingMatchesUseCase
 
 logger = logging.getLogger(__name__)
 

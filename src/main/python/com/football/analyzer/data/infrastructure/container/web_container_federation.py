@@ -1,13 +1,13 @@
+from .notification_container import NotificationContainer
 from ..adapters.repositories.mongodb_federation_repository import MongoDBFederationRepository
+from ...application.use_cases.calendar.get_calendars_use_case import GetCalendarsUseCase
+from ...application.use_cases.calendar.get_upcoming_matches_of_calendars_use_case import GetUpcomingMatchesUseCase
 from ...application.use_cases.federation.create_or_update_federation_from_web_use_case import CreateOrUpdateFederationFromWebUseCase
 from ...application.use_cases.federation.delete_federation_use_case import DeleteFederationUseCase
 from ...application.use_cases.federation.get_all_federations_use_case import GetAllFederationsUseCase
-from ...application.use_cases.calendar.get_calendars_use_case import GetCalendarsUseCase
 from ...application.use_cases.federation.get_federations_use_case import GetFederationsUseCase
-from ...application.use_cases.calendar.get_upcoming_matches_of_calendars_use_case import GetUpcomingMatchesUseCase
 from ...domain.ports.repositories.database_connection_port import DatabaseConnectionPort
 from ...domain.ports.repositories.federation_repository_port import FederationRepositoryPort
-from .notification_container import NotificationContainer
 
 
 class WebContainerFederation:

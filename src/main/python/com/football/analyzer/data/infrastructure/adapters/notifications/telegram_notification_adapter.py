@@ -1,11 +1,12 @@
 import logging
-import requests
 from typing import Dict, Any
 
+import requests
+
+from ....commons.config.config_constants import ConfigConstants
+from ....commons.config.config_loader import ConfigLoader
 from ....domain.ports.notifications.notification_port import NotificationPort
 from ....domain.value_objects.notification_config import NotificationConfig
-from ....commons.config.config_loader import ConfigLoader
-from ....commons.config.config_constants import ConfigConstants
 
 logger = logging.getLogger(__name__)
 

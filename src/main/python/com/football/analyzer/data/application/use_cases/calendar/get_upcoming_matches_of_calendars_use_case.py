@@ -2,9 +2,9 @@ import logging
 from dataclasses import dataclass
 from typing import Dict, Any
 
+from src.main.python.com.football.analyzer.data.application.dto.federation_request_dto import GetCalendarsRequestDTO
 from src.main.python.com.football.analyzer.data.commons.config.config_constants import ConfigConstants
 from src.main.python.com.football.analyzer.data.commons.config.config_loader import ConfigLoader
-from src.main.python.com.football.analyzer.data.application.dto.federation_request_dto import GetCalendarsRequestDTO
 from .get_calendars_use_case import GetCalendarsUseCase
 
 NUMBER_OF_TEAMS_DEFAULT = 0

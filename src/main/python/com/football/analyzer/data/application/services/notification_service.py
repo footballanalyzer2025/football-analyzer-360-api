@@ -1,7 +1,7 @@
-from typing import Dict, Any, List
-from ...domain.ports.notifications.notification_port import NotificationPort
-
 import logging
+from typing import Dict, Any, List
+
+from ...domain.ports.notifications.notification_port import NotificationPort
 
 logger = logging.getLogger(__name__)
 

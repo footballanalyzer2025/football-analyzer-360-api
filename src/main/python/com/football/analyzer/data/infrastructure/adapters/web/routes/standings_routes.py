@@ -23,7 +23,7 @@ def init_routes(web_container_standings: WebContainerStandings):
         validation_error = dto.validate()
         if validation_error:
             return jsonify({'error': validation_error}), 400
-        result = web_container_standings.get_standings_use_case.execute(dto)
+        result = web_container_standings.get_standings_from_web_use_case.execute(dto)
         status_code = 200 if result.success else 400
         return jsonify({
             'success': result.success,

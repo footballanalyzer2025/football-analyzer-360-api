@@ -13,7 +13,6 @@ class WebScrappingCompetitionsByFederationsOrchestratorService:
     def __init__(self, web_scrapping_data_source_container: WebScrappingDataSourceContainer):
         self.config_loader = ConfigLoader()
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
-        self.web_scrapping_data_source_container = web_scrapping_data_source_container
         self.main_helper = WebScrappingMainDataLiveFootballHelper(
             web_scrapping_data_source_container,
             self.config_loader
@@ -109,8 +108,6 @@ class WebScrappingCompetitionsByFederationsOrchestratorService:
                 [],
                 False
             )
-            # if with_matches:
-            #     competitions_data[competition_name][ConfigConstants.TEAMS_DATA] = self.teams_helper.get_teams_data(teams_data)
 
     def _enriched_competitions_data_with_results_and_standings_section(self, competition_name, competition_sections, competitions_data):
         results_and_standings_section = self.config_loader.get_results_and_standings_section()

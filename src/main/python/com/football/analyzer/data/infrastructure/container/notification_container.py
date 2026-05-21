@@ -1,7 +1,7 @@
-from ...domain.ports.notifications.notification_port import NotificationPort
-from ...domain.value_objects.notification_config import NotificationConfig
 from ..adapters.notifications.telegram_notification_adapter import TelegramNotificationAdapter
 from ...application.services.notification_service import NotificationService
+from ...domain.ports.notifications.notification_port import NotificationPort
+from ...domain.value_objects.notification_config import NotificationConfig
 
 
 class NotificationContainer:

@@ -1,6 +1,6 @@
+from .web_container_federation import WebContainerFederation
 from .web_container_team import WebContainerTeam
 from ...application.use_cases.stats.get_stats_use_case import GetStatsUseCase
-from .web_container_federation import WebContainerFederation
 
 
 class WebContainerStats:

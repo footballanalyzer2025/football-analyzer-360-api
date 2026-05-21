@@ -7,13 +7,13 @@ from typing import Dict, Any
 from flask import current_app
 
 from ...dto.federation_request_dto import CreateOrUpdateFederationFromWebRequestDTO
+from ....application.services.notification_service import NotificationService
 from ....commons.config.config_constants import ConfigConstants
 from ....commons.config.config_loader import ConfigLoader
 from ....domain.ports.repositories.federation_repository_port import FederationRepositoryPort
 from ....infrastructure.adapters.services.web_scrapping_competitions_by_federations_data_source_adapter import (
     WebScrappingCompetitionsByFederationsDataSourceAdapter
 )
-from ....application.services.notification_service import NotificationService
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +67,7 @@ class CreateOrUpdateFederationFromWebUseCase:
                         "Federations Scraping Error",
                         e,
                         {
-                            "competitions_by_federation": len(dto.competitions_by_federation)
+                            "standings_by_competitions_and_federation": len(dto.competitions_by_federation)
                         }
                     )
 
