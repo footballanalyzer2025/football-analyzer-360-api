@@ -82,26 +82,28 @@ class GetStatsUseCase:
             del upcoming_matches[federation]
 
     def _process_competition_matches(self, federation: str, competition_data: Dict[str, Any], all_teams: Dict[str, Dict[str, Any]]) -> bool:
-        total_upcoming = competition_data.get(ConfigConstants.TOTAL_UPCOMING, 0)
-        if total_upcoming == 0:
-            return False
-        standings_url = self._get_standings_url(competition_data, federation)
-        # TODO _get_competition_standing
-        standing_competition = self._get_competition_standing(standings_url)
-        upcoming_matches = competition_data.get(ConfigConstants.UPCOMING_MATCHES, [])
         has_matches_to_analyze = False
+        if self._is_total_upcoming_more_than_zero(competition_data):
+            upcoming_matches = competition_data.get(ConfigConstants.UPCOMING_MATCHES, [])
+            has_matches_to_analyze = self._get_matches_to_analyze(all_teams, has_matches_to_analyze, upcoming_matches)
+            if has_matches_to_analyze:
+                self._get_stats_of_upcoming_matches(all_teams, competition_data, federation, upcoming_matches)
+        return has_matches_to_analyze
+
+    @staticmethod
+    def _is_total_upcoming_more_than_zero(competition_data):
+        has_matches_to_analyze = False
+        total_upcoming = competition_data.get(ConfigConstants.TOTAL_UPCOMING, 0)
+        if total_upcoming > 0:
+            has_matches_to_analyze = True
+        return has_matches_to_analyze
+
+    def _get_matches_to_analyze(self, all_teams, has_matches_to_analyze, upcoming_matches):
         for match in upcoming_matches:
             if self._is_match_ready_for_analysis(match, all_teams):
                 self._mark_match_for_analysis(match)
-                self._get_stats_to_match(match, all_teams, standing_competition)
                 has_matches_to_analyze = True
         return has_matches_to_analyze
-
-    def _get_standings_url(self, competition_data, federation):
-        standings_url = competition_data[self._config_loader.get_results_and_standings_section()][ConfigConstants.MAIN_URL]
-        if federation == ConfigConstants.FIFA:
-            standings_url = self._config_loader.get_fifa_world_ranking_url_special_case()
-        return standings_url
 
     @staticmethod
     def _is_match_ready_for_analysis(match: Dict[str, Any], all_teams: Dict[str, Dict[str, Any]]) -> bool:
@@ -119,8 +121,20 @@ class GetStatsUseCase:
         match[ConfigConstants.STATUS] = self._config_loader.get_selector(ConfigConstants.STATUS_MATCH_TO_ANALYZE)
         match[ConfigConstants.STATS] = {}
 
+    def _get_stats_of_upcoming_matches(self, all_teams, competition_data, federation, upcoming_matches):
+        standing_competition = self._get_standings_competition(self._get_standings_url(competition_data, federation))
+        for match in upcoming_matches:
+            if self._config_loader.get_selector(ConfigConstants.STATUS_MATCH_TO_ANALYZE) == match[ConfigConstants.STATUS]:
+                self._get_stats_to_match(match, all_teams, standing_competition)
+
+    def _get_standings_url(self, competition_data, federation):
+        standings_url = competition_data[self._config_loader.get_results_and_standings_section()][ConfigConstants.MAIN_URL]
+        if federation == ConfigConstants.FIFA:
+            standings_url = self._config_loader.get_fifa_world_ranking_url_special_case()
+        return standings_url
+
     @staticmethod
-    def _get_competition_standing(standings_url) -> Any:
+    def _get_standings_competition(standings_url) -> Any:
         print(standings_url)
         return None
 
