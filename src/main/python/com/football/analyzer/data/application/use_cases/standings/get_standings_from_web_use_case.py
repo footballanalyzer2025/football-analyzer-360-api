@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class GetStandingsFromWebResult:
     success: bool
     message: str
-    data: Dict[str, Any]
+    standings_data: Dict[str, Any]
 
 
 class GetStandingsFromWebUseCase:
@@ -31,7 +31,7 @@ class GetStandingsFromWebUseCase:
             return GetStandingsFromWebResult(
                 success=False,
                 message=validation_error,
-                data={}
+                standings_data={}
             )
         collection = self._federation_repository.get_collection()
         requested = dto.standings_by_federation_and_competitions
@@ -61,7 +61,7 @@ class GetStandingsFromWebUseCase:
         return GetStandingsFromWebResult(
             success=True,
             message=f"Retrieved standings for {len(result)} federations",
-            data=result
+            standings_data=result
         )
 
     def _get_standings_url(self, comp_name, competitions_data, federation_name, results_and_standings_section):

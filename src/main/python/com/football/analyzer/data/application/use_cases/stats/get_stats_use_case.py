@@ -42,10 +42,8 @@ class GetStatsUseCase:
             )
         all_teams = self._get_all_teams_indexed_by_name()
         upcoming_matches = self._get_upcoming_matches(dto)
-        standings = self._get_standings_from_web_use_case.execute(
-            StandingsRequestDTO(dto.stats_by_federation_and_competitions)
-        )
-        self._process_upcoming_matches(upcoming_matches, all_teams)
+        standings = self._get_standings(dto)
+        self._process_upcoming_matches(upcoming_matches, all_teams, standings)
         return GetStatsResult(
             success=True,
             message="Stats processed successfully",
@@ -61,21 +59,36 @@ class GetStatsUseCase:
             GetCalendarsRequestDTO(dto.stats_by_federation_and_competitions)
         ).upcoming_matches_by_federation_and_competition
 
-    def _process_upcoming_matches(self, upcoming_matches: Dict[str, Any], all_teams: Dict[str, Dict[str, Any]]) -> None:
+    def _get_standings(self, dto: StatsRequestDTO) -> Dict[str, Any]:
+        return self._get_standings_from_web_use_case.execute(
+            StandingsRequestDTO(dto.stats_by_federation_and_competitions)
+        ).standings_data
+
+    def _process_upcoming_matches(self,
+                                  upcoming_matches: Dict[str, Any],
+                                  all_teams: Dict[str, Dict[str, Any]],
+                                  standings: Dict[str, Any]) -> None:
         federations_to_remove = []
         for federation, competitions in upcoming_matches.items():
-            competitions_to_remove = self._process_competitions(federation, competitions, all_teams)
+            competitions_to_remove = self._process_competitions(federation, competitions, all_teams, standings)
             self._remove_empty_competitions(competitions, competitions_to_remove)
             if not competitions:
                 federations_to_remove.append(federation)
         self._remove_empty_federations(upcoming_matches, federations_to_remove)
 
-    def _process_competitions(self, federation: str, competitions: Dict[str, Any], all_teams: Dict[str, Dict[str, Any]]) -> List[str]:
+    def _process_competitions(self,
+                              federation: str,
+                              competitions: Dict[str, Any],
+                              all_teams: Dict[str, Dict[str, Any]],
+                              standings: Dict[str, Any]) -> List[str]:
         competitions_to_remove = []
-        for competition_name, competition_data in competitions.items():
-            has_matches_to_analyze = self._process_competition_matches(federation, competition_data, all_teams)
-            if not has_matches_to_analyze:
-                competitions_to_remove.append(competition_name)
+        if federation in standings:
+            for competition_name, competition_data in competitions.items():
+                if competition_name in standings[federation]:
+                    if ConfigConstants.STANDINGS_DATA in standings[federation][competition_name]:
+                        has_matches_to_analyze = self._process_competition_matches(competition_data, all_teams, standings[federation][competition_name][ConfigConstants.STANDINGS_DATA])
+                        if not has_matches_to_analyze:
+                            competitions_to_remove.append(competition_name)
         return competitions_to_remove
 
     @staticmethod
@@ -88,13 +101,16 @@ class GetStatsUseCase:
         for federation in federations_to_remove:
             del upcoming_matches[federation]
 
-    def _process_competition_matches(self, federation: str, competition_data: Dict[str, Any], all_teams: Dict[str, Dict[str, Any]]) -> bool:
+    def _process_competition_matches(self,
+                                     competition_data: Dict[str, Any],
+                                     all_teams: Dict[str, Dict[str, Any]],
+                                     standings: Dict[str, Any]) -> bool:
         has_matches_to_analyze = False
         if self._is_total_upcoming_more_than_zero(competition_data):
             upcoming_matches = competition_data.get(ConfigConstants.UPCOMING_MATCHES, [])
             has_matches_to_analyze = self._get_matches_to_analyze(all_teams, has_matches_to_analyze, upcoming_matches)
             if has_matches_to_analyze:
-                self._get_stats_of_upcoming_matches(all_teams, competition_data, federation, upcoming_matches)
+                self._get_stats_of_upcoming_matches(all_teams, upcoming_matches, standings)
         return has_matches_to_analyze
 
     @staticmethod
@@ -128,24 +144,13 @@ class GetStatsUseCase:
         match[ConfigConstants.STATUS] = self._config_loader.get_selector(ConfigConstants.STATUS_MATCH_TO_ANALYZE)
         match[ConfigConstants.STATS] = {}
 
-    def _get_stats_of_upcoming_matches(self, all_teams, competition_data, federation, upcoming_matches):
-        standing_competition = self._get_standings_competition(self._get_standings_url(competition_data, federation))
+    def _get_stats_of_upcoming_matches(self, all_teams, upcoming_matches, standings):
         for match in upcoming_matches:
             if self._config_loader.get_selector(ConfigConstants.STATUS_MATCH_TO_ANALYZE) == match[ConfigConstants.STATUS]:
-                self._get_stats_to_match(match, all_teams, standing_competition)
-
-    def _get_standings_url(self, competition_data, federation):
-        standings_url = competition_data[self._config_loader.get_results_and_standings_section()][ConfigConstants.MAIN_URL]
-        if federation == ConfigConstants.FIFA:
-            standings_url = self._config_loader.get_fifa_world_ranking_url_special_case()
-        return standings_url
-
-    @staticmethod
-    def _get_standings_competition(standings_url) -> Any:
-        print(standings_url)
-        return None
+                self._get_stats_to_match(match, all_teams, standings)
 
     @staticmethod
     def _get_stats_to_match(match: Dict[str, Any], all_teams: Dict[str, Dict[str, Any]], standing_competition: Any) -> None:
+        # TODO get stats of the match
         home_team_matches = all_teams[match[ConfigConstants.HOME_TEAM]][ConfigConstants.MATCHES][ConfigConstants.ALL_MATCHES]
         away_team_matches = all_teams[match[ConfigConstants.AWAY_TEAM]][ConfigConstants.MATCHES][ConfigConstants.ALL_MATCHES]
