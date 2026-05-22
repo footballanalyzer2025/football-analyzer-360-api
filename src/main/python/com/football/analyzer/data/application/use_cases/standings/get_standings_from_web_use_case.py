@@ -50,7 +50,7 @@ class GetStandingsFromWebUseCase:
             for comp_name in competition_names:
                 standings_main_url = self._get_standings_url(comp_name, competitions_data, federation_name, results_and_standings_section)
                 if standings_main_url:
-                    standings_data = self._scraping_adapter.get_main_data({comp_name: standings_main_url})
+                    standings_data = self._scraping_adapter.get_main_data({federation_name: {comp_name: standings_main_url}})
                     fed_result[comp_name] = {
                         results_and_standings_section: standings_main_url,
                         ConfigConstants.STANDINGS_DATA: standings_data
