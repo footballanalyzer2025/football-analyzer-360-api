@@ -44,7 +44,11 @@ class ConfigLoader(metaclass=SingletonMeta):
         return [item.strip() for item in filter_str.split(',') if item.strip()]
 
     def get_fifa_world_ranking_url_special_case(self) -> dict:
-        return self.all_config_ini[f'{self.constants.FIFA}-{self.constants.WORLD_CUP}'][self.constants.WORLD_RANKING_URL]
+        return self.all_config_ini[f'{self.constants.FIFA}_{self.constants.WORLD_CUP}'][self.constants.WORLD_RANKING_URL]
+
+    def get_competitions_types_config(self):
+        all_sections = self.all_config_ini.sections()
+        return [self.all_config_ini[section] for section in all_sections if section.startswith(self.constants.LF_COMPETITION_TYPE_)]
 
     def get_competition_type_section_at_ini(self, key):
         return self.all_config_ini[key]

@@ -5,7 +5,13 @@ from main.python.com.football.analyzer.data.infrastructure.adapters.standings.fi
 
 class StandingsWebParserFactory:
     _parsers = {
-        f'{ConfigConstants.FIFA}-{ConfigConstants.WORLD_CUP}': FifaWorldCupStandingsWebParserAdapter()
+        f'{ConfigConstants.FIFA}_{ConfigConstants.WORLD_CUP}': FifaWorldCupStandingsWebParserAdapter()
+        # ConfigConstants.LF_COMPETITION_TYPE_LIGA_STANDARD: LigaStandardStandingsWebParserAdapter()
+        # ConfigConstants.LF_COMPETITION_TYPE_LIGA_ARGENTINA: LigaArgentinaStandingsWebParserAdapter()
+        # ConfigConstants.LF_COMPETITION_TYPE_LIGA_COLOMBIA: LigaColombiaStandingsWebParserAdapter()
+        # ConfigConstants.LF_COMPETITION_TYPE_NATIONAL_TEAM_CUP: NationalTeamCupStandingsWebParserAdapter()
+        # ConfigConstants.LF_COMPETITION_TYPE_CONTINENTAL_CLUB_CUP: ContinentalTeamCupStandingsWebParserAdapter()
+        # ConfigConstants.LF_COMPETITION_TYPE_CONTINENTAL_LIGA_CUP: ContinentalLigaCupStandingsWebParserAdapter()
     }
 
     @classmethod

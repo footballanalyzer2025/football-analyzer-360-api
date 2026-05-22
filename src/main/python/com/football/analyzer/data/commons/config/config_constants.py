@@ -15,6 +15,19 @@ class ConfigConstants:
     TEAMS_SECTIONS = "TEAMS_SECTIONS"
     DATES_AND_RESULTS_SECTION = "DATES_AND_RESULTS_SECTION"
     H2H_SECTION = "H2H_SECTION"
+
+    # ========================================================================== #
+    #                    LIVE FOOTBALL COMPETITION TYPE                          #
+    # ========================================================================== #
+    LF_COMPETITION_TYPE_ = "LF_COMPETITION_TYPE_"
+    LF_COMPETITION_TYPE_LIGA_STANDARD = "LF_COMPETITION_TYPE_LIGA_STANDARD"
+    LF_COMPETITION_TYPE_LIGA_ARGENTINA = "LF_COMPETITION_TYPE_LIGA_ARGENTINA"
+    LF_COMPETITION_TYPE_LIGA_COLOMBIA = "LF_COMPETITION_TYPE_LIGA_COLOMBIA"
+    LF_COMPETITION_TYPE_NATIONAL_TEAM_CUP = "LF_COMPETITION_TYPE_NATIONAL_TEAM_CUP"
+    LF_COMPETITION_TYPE_CONTINENTAL_CLUB_CUP = "LF_COMPETITION_TYPE_CONTINENTAL_CLUB_CUP"
+    LF_COMPETITION_TYPE_CONTINENTAL_LIGA_CUP = "LF_COMPETITION_TYPE_CONTINENTAL_LIGA_CUP"
+    COMPETITIONS = "COMPETITIONS"
+
     # ========================================================================== #
     #                    LIVE FOOTBALL FIFA (Special Case)                       #
     # ========================================================================== #
@@ -101,6 +114,7 @@ class ConfigConstants:
     STATS = 'stats'
 
     STANDINGS_DATA = "standings_data"
+    GENERAL_STANDING = "general_standing"
 
     HEADERS = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -119,7 +133,6 @@ class ConfigConstants:
     # ========================================================================== #
     #                                REQUESTS BODY                               #
     # ========================================================================== #
-
     CALENDARS_BY_FEDERATION_AND_COMPETITIONS = "calendars_by_federation_and_competitions"
     STANDINGS_BY_FEDERATION_AND_COMPETITIONS = "standings_by_federation_and_competitions"
     STATS_BY_FEDERATION_AND_COMPETITIONS = "stats_by_federation_and_competitions"

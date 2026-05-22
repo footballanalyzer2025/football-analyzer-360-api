@@ -5,8 +5,10 @@ from typing import Dict, Any, List
 from main.python.com.football.analyzer.data.commons.config.config_constants import ConfigConstants
 from main.python.com.football.analyzer.data.commons.config.config_loader import ConfigLoader
 from ..calendar.get_upcoming_matches_of_calendars_use_case import GetUpcomingMatchesUseCase
+from ..standings.get_standings_from_web_use_case import GetStandingsFromWebUseCase
 from ..team.get_all_teams_use_case import GetAllTeamsUseCase
 from ...dto.federation_request_dto import GetCalendarsRequestDTO
+from ...dto.standings_request_dto import StandingsRequestDTO
 from ...dto.stats_request_dto import StatsRequestDTO
 
 logger = logging.getLogger(__name__)
@@ -23,9 +25,11 @@ class GetStatsUseCase:
 
     def __init__(self,
                  get_upcoming_matches_use_case: GetUpcomingMatchesUseCase,
-                 get_all_teams_use_case: GetAllTeamsUseCase):
+                 get_all_teams_use_case: GetAllTeamsUseCase,
+                 get_standings_from_web_use_case: GetStandingsFromWebUseCase):
         self._get_upcoming_matches_use_case = get_upcoming_matches_use_case
         self._get_all_teams_use_case = get_all_teams_use_case
+        self._get_standings_from_web_use_case = get_standings_from_web_use_case
         self._config_loader = ConfigLoader()
 
     def execute(self, dto: StatsRequestDTO) -> GetStatsResult:
@@ -38,6 +42,9 @@ class GetStatsUseCase:
             )
         all_teams = self._get_all_teams_indexed_by_name()
         upcoming_matches = self._get_upcoming_matches(dto)
+        standings = self._get_standings_from_web_use_case.execute(
+            StandingsRequestDTO(dto.stats_by_federation_and_competitions)
+        )
         self._process_upcoming_matches(upcoming_matches, all_teams)
         return GetStatsResult(
             success=True,
