@@ -22,16 +22,13 @@ class WebScrappingStandingsHelper:
     def get_standings_from_url(self, standings_by_competitions_and_federation: Dict) -> Dict[str, Any]:
         federation_name, competition_standings_url_data = next(iter(standings_by_competitions_and_federation.items()))
         if not federation_name or not competition_standings_url_data:
-            logger.warning(f"No federation_name or competition standing url provided for competition")
             return {}
         competition_name, standings_url = next(iter(competition_standings_url_data.items()))
         if not competition_name or not standings_url:
-            logger.warning(f"No competition or standings URL provided for competition in {federation_name}")
             return {}
         try:
             return self._get_standings_data(federation_name, competition_name, standings_url)
-        except Exception as e:
-            logger.error(f"Failed to scrape standings for {competition_name}: {e}")
+        except KeyError:
             return {}
 
     def _get_standings_data(self, federation_name, competition_name, standings_url):
