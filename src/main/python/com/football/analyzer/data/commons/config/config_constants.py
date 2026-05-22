@@ -47,6 +47,7 @@ class ConfigConstants:
     STATUS_MATCH_FINISHED_SELECTOR = "STATUS_MATCH_FINISHED"
     STATUS_MATCH_UPCOMING_SELECTOR = "STATUS_MATCH_UPCOMING"
     STATUS_MATCH_TO_ANALYZE = "STATUS_MATCH_TO_ANALYZE"
+    LF_SELECTOR_STANDING = "LF_SELECTOR_STANDING"
 
     # ========================================================================== #
     #                      KEYS COMPETITIONS AND MATCHES                         #
