@@ -6,7 +6,7 @@ from typing import Dict
 from flask import current_app
 
 from ...dto.federation_request_dto import GetFederationsRequestDTO
-from ...services.notification_service import NotificationService
+from main.python.com.football.analyzer.data.application.services.notifications.notification_service import NotificationService
 from ....application.dto.team_request_dto import CreateTeamsFromWebRequestDTO
 from ....commons.config.config_constants import ConfigConstants
 from ....domain.ports.repositories.team_repository_port import TeamRepositoryPort

@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, Any, List
 
-from ...domain.ports.notifications.notification_port import NotificationPort
+from main.python.com.football.analyzer.data.domain.ports.notifications.notification_port import NotificationPort
 
 logger = logging.getLogger(__name__)
 

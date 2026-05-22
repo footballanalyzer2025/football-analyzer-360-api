@@ -7,7 +7,7 @@ from typing import Dict, Any
 from flask import current_app
 
 from ...dto.federation_request_dto import CreateOrUpdateFederationFromWebRequestDTO
-from ....application.services.notification_service import NotificationService
+from main.python.com.football.analyzer.data.application.services.notifications.notification_service import NotificationService
 from ....commons.config.config_constants import ConfigConstants
 from ....commons.config.config_loader import ConfigLoader
 from ....domain.ports.repositories.federation_repository_port import FederationRepositoryPort

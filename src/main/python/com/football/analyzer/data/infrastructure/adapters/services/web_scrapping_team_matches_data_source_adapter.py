@@ -1,6 +1,6 @@
 from typing import Dict, Any
 
-from src.main.python.com.football.analyzer.data.application.services.web_scrapping_team_matches_orchestrator_service import WebScrappingTeamMatchesOrchestratorService
+from main.python.com.football.analyzer.data.application.services.web_scrapping.web_scrapping_team_matches_orchestrator_service import WebScrappingTeamMatchesOrchestratorService
 from src.main.python.com.football.analyzer.data.commons.config.config_constants import ConfigConstants
 from src.main.python.com.football.analyzer.data.domain.ports.services.data_source_port import DataSourcePort
 from src.main.python.com.football.analyzer.data.infrastructure.container.web_scrapping_data_source_container import WebScrappingDataSourceContainer
