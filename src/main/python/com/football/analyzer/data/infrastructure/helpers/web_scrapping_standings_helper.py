@@ -28,27 +28,19 @@ class WebScrappingStandingsHelper:
             logger.warning(f"No competition or standings URL provided for competition in {federation_name}")
             return {}
         try:
-            return {
-                "federation": federation_name,
-                "competition": competition_name,
-                "raw_data": self._get_row_data(federation_name, competition_name, standings_url)
-            }
+            return self._get_standings_data(federation_name, competition_name, standings_url)
         except Exception as e:
             logger.error(f"Failed to scrape standings for {competition_name}: {e}")
             return {}
 
-    def _get_row_data(self, federation_name, competition_name, standings_url):
+    def _get_standings_data(self, federation_name, competition_name, standings_url):
         standings_table_html_content = self._web_scrapping_data_source_container.get_html_content(standings_url)
         competition_type = self._get_competition_type(federation_name, competition_name)
         competition_type_section = self._config_loader.get_competition_type_section_at_ini(competition_type)
         standings_table_html_soup = self._web_scrapping_data_source_container.parse_html(standings_table_html_content).select_one(competition_type_section[ConfigConstants.LF_SELECTOR_STANDING])
         if not standings_table_html_soup:
             return {}
-        standings = StandingsWebParserFactory.get_parser(competition_type_section.name).get_standings_in_html_soup(standings_table_html_soup)
-        row_data = {
-            "Standings": standings
-        }
-        return row_data
+        return StandingsWebParserFactory.get_parser(competition_type_section.name).get_standings_in_html_soup(standings_table_html_soup)
 
     @staticmethod
     def _get_competition_type(federation_name: str, competition_name: str):
