@@ -4,6 +4,7 @@ from typing import Dict, Any, List
 
 from main.python.com.football.analyzer.data.commons.config.config_constants import ConfigConstants
 from main.python.com.football.analyzer.data.commons.config.config_loader import ConfigLoader
+from main.python.com.football.analyzer.data.infrastructure.helpers.competition_type_helper import CompetitionTypeHelper
 from ..calendar.get_upcoming_matches_of_calendars_use_case import GetUpcomingMatchesUseCase
 from ..standings.get_standings_from_web_use_case import GetStandingsFromWebUseCase
 from ..team.get_all_teams_use_case import GetAllTeamsUseCase
@@ -31,6 +32,7 @@ class GetStatsUseCase:
         self._get_all_teams_use_case = get_all_teams_use_case
         self._get_standings_from_web_use_case = get_standings_from_web_use_case
         self._config_loader = ConfigLoader()
+        self._competition_type_helper = CompetitionTypeHelper()
 
     def execute(self, dto: StatsRequestDTO) -> GetStatsResult:
         validation_error = dto.validate()
@@ -86,7 +88,8 @@ class GetStatsUseCase:
             for competition_name, competition_data in competitions.items():
                 if competition_name in standings[federation]:
                     if ConfigConstants.STANDINGS_DATA in standings[federation][competition_name]:
-                        has_matches_to_analyze = self._process_competition_matches(competition_data, all_teams, standings[federation][competition_name][ConfigConstants.STANDINGS_DATA])
+                        competition_type = self._competition_type_helper.get_competition_type(federation, competition_name)
+                        has_matches_to_analyze = self._process_competition_matches(competition_type, competition_data, all_teams, standings[federation][competition_name][ConfigConstants.STANDINGS_DATA])
                         if not has_matches_to_analyze:
                             competitions_to_remove.append(competition_name)
         return competitions_to_remove
@@ -102,6 +105,7 @@ class GetStatsUseCase:
             del upcoming_matches[federation]
 
     def _process_competition_matches(self,
+                                     competition_type: str,
                                      competition_data: Dict[str, Any],
                                      all_teams: Dict[str, Dict[str, Any]],
                                      standings: Dict[str, Any]) -> bool:
@@ -110,7 +114,7 @@ class GetStatsUseCase:
             upcoming_matches = competition_data.get(ConfigConstants.UPCOMING_MATCHES, [])
             has_matches_to_analyze = self._get_matches_to_analyze(all_teams, has_matches_to_analyze, upcoming_matches)
             if has_matches_to_analyze:
-                self._get_stats_of_upcoming_matches(all_teams, upcoming_matches, standings)
+                self._get_stats_of_upcoming_matches(competition_type, all_teams, upcoming_matches, standings)
         return has_matches_to_analyze
 
     @staticmethod
@@ -144,13 +148,13 @@ class GetStatsUseCase:
         match[ConfigConstants.STATUS] = self._config_loader.get_selector(ConfigConstants.STATUS_MATCH_TO_ANALYZE)
         match[ConfigConstants.STATS] = {}
 
-    def _get_stats_of_upcoming_matches(self, all_teams, upcoming_matches, standings):
+    def _get_stats_of_upcoming_matches(self, competition_type: str, all_teams, upcoming_matches, standings):
         for match in upcoming_matches:
             if self._config_loader.get_selector(ConfigConstants.STATUS_MATCH_TO_ANALYZE) == match[ConfigConstants.STATUS]:
-                self._get_stats_to_match(match, all_teams, standings)
+                self._get_stats_to_match(competition_type, match, all_teams, standings)
 
     @staticmethod
-    def _get_stats_to_match(match: Dict[str, Any], all_teams: Dict[str, Dict[str, Any]], standing_competition: Any) -> None:
+    def _get_stats_to_match(competition_type: str, match: Dict[str, Any], all_teams: Dict[str, Dict[str, Any]], standing_competition: Any) -> None:
         # TODO get stats of the match
         home_team_matches = all_teams[match[ConfigConstants.HOME_TEAM]][ConfigConstants.MATCHES][ConfigConstants.ALL_MATCHES]
         away_team_matches = all_teams[match[ConfigConstants.AWAY_TEAM]][ConfigConstants.MATCHES][ConfigConstants.ALL_MATCHES]
