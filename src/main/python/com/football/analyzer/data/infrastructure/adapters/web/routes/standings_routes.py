@@ -28,7 +28,7 @@ def init_routes(web_container_standings: WebContainerStandings):
         return jsonify({
             'success': result.success,
             'message': result.message,
-            'data': result.data
+            'data': result.standings_data
         }), status_code
 
     return standings_bp
