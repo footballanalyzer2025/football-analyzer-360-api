@@ -17,13 +17,18 @@ src/
                         │   │   ├── federation_request_dto.py
                         │   │   ├── manager_date_request_dto.py
                         │   │   ├── manager_date_response_dto.py
+                        │   │   ├── standings_request_dto.py
                         │   │   ├── stats_request_dto.py
                         │   │   └── team_request_dto.py
                         │   ├── services/
-                        │   │   ├── notification_service.py
-                        │   │   ├── web_scrapping_competitions_by_federations_orchestrator_service.py
-                        │   │   ├── web_scrapping_team_matches_orchestrator_service.py
-                        │   │   └── web_scrapping_team_orchestrator_service.py
+                        │   │   ├── notifications/
+                        │   │   │   └── notification_service.py
+                        │   │   ├── parsers/
+                        │   │   └── web_scrapping/
+                        │   │       ├── web_scrapping_competitions_by_federations_orchestrator_service.py
+                        │   │       ├── web_scrapping_standings_orchestrator_service.py
+                        │   │       ├── web_scrapping_team_matches_orchestrator_service.py
+                        │   │       └── web_scrapping_team_orchestrator_service.py
                         │   └── use_cases/
                         │       ├── calendar/
                         │       │   ├── get_calendars_use_case.py
@@ -38,6 +43,8 @@ src/
                         │       │   ├── delete_manager_date_use_case.py
                         │       │   ├── get_all_manager_dates_use_case.py
                         │       │   └── get_managers_date_use_case.py
+                        │       ├── standings/
+                        │       │   └── get_standings_from_web_use_case.py
                         │       ├── stats/
                         │       │   └── get_stats_use_case.py
                         │       └── team/
@@ -73,8 +80,10 @@ src/
                         │   │   │   ├── federation_repository_port.py
                         │   │   │   ├── manager_date_repository_port.py
                         │   │   │   └── team_repository_port.py
-                        │   │   └── services/
-                        │   │       └── data_source_port.py
+                        │   │   ├── services/
+                        │   │   │   └── data_source_port.py
+                        │   │   └── standings/
+                        │   │       └── standings_web_parser_port.py
                         │   ├── repositories/
                         │   │   ├── competition_repository.py
                         │   │   └── team_repository.py
@@ -101,32 +110,40 @@ src/
                             │   ├── notifications/
                             │   │   └── telegram_notification_adapter.py
                             │   ├── parsers/
-                            │   │   └── lxml_parser_adapter.py
+                            │   │   ├── lxml_parser_adapter.py
+                            │   │   └── standings_web_parser_factory.py
                             │   ├── repositories/
                             │   │   ├── mongodb_federation_repository.py
                             │   │   ├── mongodb_manager_date_repository.py
                             │   │   └── mongodb_team_repository.py
                             │   ├── services/
                             │   │   ├── web_scrapping_competitions_by_federations_data_source_adapter.py
+                            │   │   ├── web_scrapping_standings_data_source_adapter.py
                             │   │   ├── web_scrapping_team_data_source_adapter.py
                             │   │   └── web_scrapping_team_matches_data_source_adapter.py
+                            │   ├── standings/
+                            │   │   └── fifa_world_cup_web_standings_parser_adapter.py
                             │   └── web/
                             │       ├── app.py
                             │       └── routes/
                             │           ├── federation_routes.py
                             │           ├── manager_date_routes.py
+                            │           ├── standings_routes.py
                             │           ├── stats_routes.py
                             │           └── team_routes.py
                             ├── container/
                             │   ├── notification_container.py
                             │   ├── web_container_federation.py
                             │   ├── web_container_manager_dates.py
+                            │   ├── web_container_standings.py
                             │   ├── web_container_stats.py
                             │   ├── web_container_team.py
                             │   └── web_scrapping_data_source_container.py
                             └── helpers/
+                                ├── competition_type_helper.py
                                 ├── web_scrapping_calendar_data_live_football_helper.py
                                 ├── web_scrapping_main_data_live_football_helper.py
+                                ├── web_scrapping_standings_helper.py
                                 ├── web_scrapping_team_matches_data_live_football_helper.py
                                 └── web_scrapping_teams_data_live_football_helper.py
 
