@@ -5,6 +5,7 @@ from main.python.com.football.analyzer.data.domain.ports.standings.standings_web
 
 
 class FifaWorldCupStandingsWebParserAdapter(StandingsWebParserPort):
+
     def get_standings_in_html_soup(self, standings_table_html_soup: BeautifulSoup) -> dict:
         return {
             ConfigConstants.GENERAL_STANDING: self.get_standing(standings_table_html_soup)
