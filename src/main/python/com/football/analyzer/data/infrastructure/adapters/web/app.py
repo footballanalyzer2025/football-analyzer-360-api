@@ -26,7 +26,7 @@ def create_app():
     web_container_federation = WebContainerFederation(db_connection, notification_container, app)
     web_container_team = WebContainerTeam(db_connection, web_container_manager_dates, web_container_federation, notification_container, app)
     web_container_standings = WebContainerStandings(web_container_federation)
-    web_container_stats = WebContainerStats(web_container_federation, web_container_team, web_container_standings)
+    web_container_stats = WebContainerStats(web_container_federation, web_container_team, web_container_standings, notification_container, app)
     manager_date_bp = init_manager_routes(web_container_manager_dates)
     federation_bp = init_federation_routes(web_container_federation)
     standings_bp = init_standings_routes(web_container_standings)

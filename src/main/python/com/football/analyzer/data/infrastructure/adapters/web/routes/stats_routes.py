@@ -27,8 +27,7 @@ def init_routes(web_container_stats: WebContainerStats):
         status_code = 200 if result.success else 400
         return jsonify({
             'success': result.success,
-            'message': result.message,
-            'data': result.data
+            'message': result.message
         }), status_code
 
     return stats_bp
