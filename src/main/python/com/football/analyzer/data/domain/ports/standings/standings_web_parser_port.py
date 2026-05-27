@@ -4,6 +4,7 @@ from typing import Dict
 
 
 class StandingsWebParserPort(ABC):
+
     @abstractmethod
     def get_standings_in_html_soup(self, standings_table_html_soup: BeautifulSoup) -> Dict:
         pass
