@@ -4,6 +4,7 @@ from main.python.com.football.analyzer.data.infrastructure.adapters.standings.fi
 
 
 class StandingsWebParserFactory:
+
     _parsers = {
         f'{ConfigConstants.FIFA}_{ConfigConstants.WORLD_CUP}': FifaWorldCupStandingsWebParserAdapter()
         # ConfigConstants.LF_COMPETITION_TYPE_LIGA_STANDARD: LigaStandardStandingsWebParserAdapter()
