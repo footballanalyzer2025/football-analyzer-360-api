@@ -13,6 +13,7 @@ TEAMS_MISSING_FROM_THE_RANKING_FIFA = {
 
 class FifaWorldCupAnalysisStatsStrategy(AnalysisStatsStrategy):
     def execute(self, match_to_analyze: Dict[str, Any], all_teams: Dict[str, Dict[str, Any]], all_standings_competition: Dict):
+        # TODO Standing from excel
         home_team_data_to_analyze = self._get_team_data_to_analyze(ConfigConstants.HOME_TEAM, all_standings_competition, all_teams, match_to_analyze)
         away_team_data_to_analyze = self._get_team_data_to_analyze(ConfigConstants.AWAY_TEAM, all_standings_competition, all_teams, match_to_analyze)
         print("OK")

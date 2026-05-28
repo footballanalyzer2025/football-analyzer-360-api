@@ -46,6 +46,9 @@ class ConfigLoader(metaclass=SingletonMeta):
     def get_fifa_world_ranking_url_special_case(self) -> dict:
         return self.all_config_ini[f'{self.constants.FIFA}_{self.constants.WORLD_CUP}'][self.constants.WORLD_RANKING_URL]
 
+    def get_fifa_world_ranking_file_special_case(self) -> dict:
+        return self.all_config_ini[f'{self.constants.FIFA}_{self.constants.WORLD_CUP}'][self.constants.WORLD_RANKING_FILE_PATH]
+
     def get_competitions_types_config(self):
         all_sections = self.all_config_ini.sections()
         return [self.all_config_ini[section] for section in all_sections if section.startswith(self.constants.LF_COMPETITION_TYPE_)]

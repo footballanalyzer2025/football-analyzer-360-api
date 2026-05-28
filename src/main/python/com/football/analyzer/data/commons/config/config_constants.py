@@ -34,6 +34,7 @@ class ConfigConstants:
     FIFA = "FIFA"
     WORLD_CUP = "Copa Mundial"
     WORLD_RANKING_URL = "WORLD_RANKING_URL"
+    WORLD_RANKING_FILE_PATH = "WORLD_RANKING_FILE_PATH"
 
     # ========================================================================== #
     #                      SELECTORS KEYS IN CONFIG.INI                          #
