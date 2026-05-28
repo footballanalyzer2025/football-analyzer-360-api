@@ -82,8 +82,11 @@ src/
                         │   │   │   └── team_repository_port.py
                         │   │   ├── services/
                         │   │   │   └── data_source_port.py
-                        │   │   └── standings/
-                        │   │       └── standings_web_parser_port.py
+                        │   │   ├── standings/
+                        │   │   │   ├── match_standings_stats_port.py
+                        │   │   │   └── standings_web_parser_port.py
+                        │   │   └── stats/
+                        │   │       └── analysis_stats_strategy.py
                         │   ├── repositories/
                         │   │   ├── competition_repository.py
                         │   │   └── team_repository.py
@@ -122,7 +125,11 @@ src/
                             │   │   ├── web_scrapping_team_data_source_adapter.py
                             │   │   └── web_scrapping_team_matches_data_source_adapter.py
                             │   ├── standings/
-                            │   │   └── fifa_world_cup_web_standings_parser_adapter.py
+                            │   │   ├── fifa_world_cup_web_standings_parser_adapter.py
+                            │   │   └── match_standings_stats_adapter.py
+                            │   ├── stats/
+                            │   │   ├── fifa_world_cup_analysis_stats_strategy.py
+                            │   │   └── stats_competitions_types_factory.py
                             │   └── web/
                             │       ├── app.py
                             │       └── routes/

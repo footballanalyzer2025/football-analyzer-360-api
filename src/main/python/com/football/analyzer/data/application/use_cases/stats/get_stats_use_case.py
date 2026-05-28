@@ -7,6 +7,7 @@ from flask import current_app
 
 from main.python.com.football.analyzer.data.commons.config.config_constants import ConfigConstants
 from main.python.com.football.analyzer.data.commons.config.config_loader import ConfigLoader
+from main.python.com.football.analyzer.data.infrastructure.adapters.stats.stats_competitions_types_factory import StatsCompetitionsTypesFactory
 from main.python.com.football.analyzer.data.infrastructure.helpers.competition_type_helper import CompetitionTypeHelper
 from ..calendar.get_upcoming_matches_of_calendars_use_case import GetUpcomingMatchesUseCase
 from ..standings.get_standings_from_web_use_case import GetStandingsFromWebUseCase
@@ -135,13 +136,13 @@ class GetStatsUseCase:
                                      competition_type: str,
                                      competition_data: Dict[str, Any],
                                      all_teams: Dict[str, Dict[str, Any]],
-                                     standings: Dict[str, Any]) -> bool:
+                                     all_standings_competition: Dict[str, Any]) -> bool:
         has_matches_to_analyze = False
         if self._is_total_upcoming_more_than_zero(competition_data):
             upcoming_matches = competition_data.get(ConfigConstants.UPCOMING_MATCHES, [])
             has_matches_to_analyze = self._get_matches_to_analyze(all_teams, has_matches_to_analyze, upcoming_matches)
             if has_matches_to_analyze:
-                self._get_stats_of_upcoming_matches(competition_type, all_teams, upcoming_matches, standings)
+                self._get_stats_of_upcoming_matches(competition_type, all_teams, upcoming_matches, all_standings_competition)
         return has_matches_to_analyze
 
     @staticmethod
@@ -175,13 +176,11 @@ class GetStatsUseCase:
         match[ConfigConstants.STATUS] = self._config_loader.get_selector(ConfigConstants.STATUS_MATCH_TO_ANALYZE)
         match[ConfigConstants.STATS] = {}
 
-    def _get_stats_of_upcoming_matches(self, competition_type: str, all_teams, upcoming_matches, standings):
-        for match in upcoming_matches:
-            if self._config_loader.get_selector(ConfigConstants.STATUS_MATCH_TO_ANALYZE) == match[ConfigConstants.STATUS]:
-                self._get_stats_to_match(competition_type, match, all_teams, standings)
+    def _get_stats_of_upcoming_matches(self, competition_type: str, all_teams, upcoming_matches, all_standings_competition):
+        for match_to_analyze in upcoming_matches:
+            if self._config_loader.get_selector(ConfigConstants.STATUS_MATCH_TO_ANALYZE) == match_to_analyze[ConfigConstants.STATUS]:
+                self._get_stats_to_match(competition_type, match_to_analyze, all_teams, all_standings_competition)
 
     @staticmethod
-    def _get_stats_to_match(competition_type: str, match: Dict[str, Any], all_teams: Dict[str, Dict[str, Any]], standing_competition: Any) -> None:
-        # TODO get stats of the match
-        home_team_matches = all_teams[match[ConfigConstants.HOME_TEAM]][ConfigConstants.MATCHES][ConfigConstants.ALL_MATCHES]
-        away_team_matches = all_teams[match[ConfigConstants.AWAY_TEAM]][ConfigConstants.MATCHES][ConfigConstants.ALL_MATCHES]
+    def _get_stats_to_match(competition_type: str, match_to_analyze: Dict[str, Any], all_teams: Dict[str, Dict[str, Any]], all_standings_competition: Dict) -> None:
+        return StatsCompetitionsTypesFactory.get_stats(competition_type).execute(match_to_analyze, all_teams, all_standings_competition)

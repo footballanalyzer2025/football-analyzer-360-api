@@ -103,6 +103,9 @@ class ConfigConstants:
     PENALTIES = 'penalties'
     RESULT = 'result'
     RESULT_TENDENCY = 'result_tendency'
+    RESULT_TENDENCY_WIN = 'W'
+    RESULT_TENDENCY_DRAW = 'D'
+    RESULT_TENDENCY_LOST = 'L'
     STATUS = 'status'
     SECOND_HALF = 'second_half'
     TWO_PERIODS = ':'
@@ -112,6 +115,8 @@ class ConfigConstants:
     CREATED_AT = 'created_at'
     UPDATE_AT = 'updated_at'
     STATS = 'stats'
+    POSITION = 'position'
+    OPPONENTS_DATA = 'opponents_data'
 
     STANDINGS_DATA = "standings_data"
     GENERAL_STANDING = "general_standing"
