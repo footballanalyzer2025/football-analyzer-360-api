@@ -11,7 +11,6 @@ class FifaWorldCupAnalysisStatsStrategy(AnalysisStatsStrategy):
         all_standings_competition[ConfigConstants.GENERAL_STANDING] = FifaWorldRankingExcelAdapter(ConfigLoader().get_fifa_world_ranking_file_special_case()).load_ranking()
         home_team_data_to_analyze = self._get_team_data_to_analyze(ConfigConstants.HOME_TEAM, all_standings_competition, all_teams, match_to_analyze)
         away_team_data_to_analyze = self._get_team_data_to_analyze(ConfigConstants.AWAY_TEAM, all_standings_competition, all_teams, match_to_analyze)
-        print("OK")
 
     def _get_team_data_to_analyze(self, venue_team, all_standings_competition, all_teams, match_to_analyze) -> Dict:
         team_name = match_to_analyze[venue_team]
@@ -32,7 +31,8 @@ class FifaWorldCupAnalysisStatsStrategy(AnalysisStatsStrategy):
             if opponent in ranking_fifa:
                 standings_opponents[opponent] = {
                     ConfigConstants.POSITION: ranking_fifa[opponent],
-                    ConfigConstants.RESULT_TENDENCY: self._get_all_results_tendencies(opponent, finished_match[ConfigConstants.RESULT], team_name)
+                    ConfigConstants.RESULT_TENDENCY: self._get_all_results_tendencies(opponent, finished_match[ConfigConstants.RESULT], team_name),
+                    ConfigConstants.DATE: finished_match[ConfigConstants.DATE]
                 }
         return dict(sorted(standings_opponents.items(), key=lambda item: item[1][ConfigConstants.POSITION]))
 
