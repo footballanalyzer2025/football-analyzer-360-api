@@ -126,6 +126,7 @@ src/
                             │   │   └── web_scrapping_team_matches_data_source_adapter.py
                             │   ├── standings/
                             │   │   ├── fifa_world_cup_web_standings_parser_adapter.py
+                            │   │   ├── fifa_world_ranking_excel_adapter.py
                             │   │   └── match_standings_stats_adapter.py
                             │   ├── stats/
                             │   │   ├── fifa_world_cup_analysis_stats_strategy.py
