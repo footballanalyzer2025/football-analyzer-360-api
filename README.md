@@ -24,6 +24,8 @@ src/
                         │   │   ├── notifications/
                         │   │   │   └── notification_service.py
                         │   │   ├── parsers/
+                        │   │   ├── standings/
+                        │   │   │   └── standings_table_builder.py
                         │   │   └── web_scrapping/
                         │   │       ├── web_scrapping_competitions_by_federations_orchestrator_service.py
                         │   │       ├── web_scrapping_standings_orchestrator_service.py
