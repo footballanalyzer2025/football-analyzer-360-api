@@ -1,10 +1,13 @@
 from typing import Dict, Any
 
+from matplotlib import pyplot as plt
+
 from main.python.com.football.analyzer.data.application.services.standings.standings_table_builder import StandingsTableBuilder
 from main.python.com.football.analyzer.data.commons.config.config_constants import ConfigConstants
 from main.python.com.football.analyzer.data.commons.config.config_loader import ConfigLoader
 from main.python.com.football.analyzer.data.domain.ports.stats.analysis_stats_strategy import AnalysisStatsStrategy
 from main.python.com.football.analyzer.data.infrastructure.adapters.standings.fifa_world_ranking_excel_adapter import FifaWorldRankingExcelAdapter
+from main.python.com.football.analyzer.data.infrastructure.adapters.visualization.standings.standings_table_renderer import StandingsTableRenderer
 
 
 class FifaWorldCupAnalysisStatsStrategy(AnalysisStatsStrategy):
@@ -12,6 +15,7 @@ class FifaWorldCupAnalysisStatsStrategy(AnalysisStatsStrategy):
     def execute(self, match_to_analyze: Dict[str, Any], all_teams: Dict[str, Dict[str, Any]], all_standings_competition: Dict):
         home_team_data_to_analyze, away_team_data_to_analyze = self._get_teams_data_to_analyze(all_standings_competition, all_teams, match_to_analyze)
         home_opponents_standings, away_opponents_standings = self._get_opponents_standings_to_teams(away_team_data_to_analyze, home_team_data_to_analyze, match_to_analyze)
+        self._get_figs_of_teams(away_opponents_standings, home_opponents_standings, match_to_analyze)
         return None
 
     def _get_teams_data_to_analyze(self, all_standings_competition, all_teams, match_to_analyze):
@@ -76,3 +80,15 @@ class FifaWorldCupAnalysisStatsStrategy(AnalysisStatsStrategy):
             opponent_name=opponent_team_name,
             opponent_position=opponent_position
         )
+
+    @staticmethod
+    def _get_figs_of_teams(away_opponents_standings, home_opponents_standings, match_to_analyze):
+        renderer = StandingsTableRenderer()
+        home_team_name = match_to_analyze[ConfigConstants.HOME_TEAM]
+        away_team_name = match_to_analyze[ConfigConstants.AWAY_TEAM]
+        fig_home = renderer.create_figure(home_opponents_standings, home_team_name, away_team_name)
+        fig_home.savefig(f"standings_{home_team_name}_vs_{away_team_name}.png", dpi=150)
+        plt.close(fig_home)
+        fig_away = renderer.create_figure(away_opponents_standings, away_team_name, home_team_name)
+        fig_away.savefig(f"standings_{away_team_name}_vs_{home_team_name}.png", dpi=150)
+        plt.close(fig_away)
