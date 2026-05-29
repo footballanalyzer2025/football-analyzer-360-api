@@ -1,5 +1,6 @@
 from typing import Dict, Any
 
+from main.python.com.football.analyzer.data.application.services.standings.standings_table_builder import StandingsTableBuilder
 from main.python.com.football.analyzer.data.commons.config.config_constants import ConfigConstants
 from main.python.com.football.analyzer.data.commons.config.config_loader import ConfigLoader
 from main.python.com.football.analyzer.data.domain.ports.stats.analysis_stats_strategy import AnalysisStatsStrategy
@@ -7,10 +8,16 @@ from main.python.com.football.analyzer.data.infrastructure.adapters.standings.fi
 
 
 class FifaWorldCupAnalysisStatsStrategy(AnalysisStatsStrategy):
+
     def execute(self, match_to_analyze: Dict[str, Any], all_teams: Dict[str, Dict[str, Any]], all_standings_competition: Dict):
+        home_team_data_to_analyze, away_team_data_to_analyze = self._get_teams_data_to_analyze(all_standings_competition, all_teams, match_to_analyze)
+        home_opponents_standings, away_opponents_standings = self._get_opponents_standings_to_teams(away_team_data_to_analyze, home_team_data_to_analyze, match_to_analyze)
+        return None
+
+    def _get_teams_data_to_analyze(self, all_standings_competition, all_teams, match_to_analyze):
         all_standings_competition[ConfigConstants.GENERAL_STANDING] = FifaWorldRankingExcelAdapter(ConfigLoader().get_fifa_world_ranking_file_special_case()).load_ranking()
-        home_team_data_to_analyze = self._get_team_data_to_analyze(ConfigConstants.HOME_TEAM, all_standings_competition, all_teams, match_to_analyze)
-        away_team_data_to_analyze = self._get_team_data_to_analyze(ConfigConstants.AWAY_TEAM, all_standings_competition, all_teams, match_to_analyze)
+        return (self._get_team_data_to_analyze(ConfigConstants.HOME_TEAM, all_standings_competition, all_teams, match_to_analyze),
+                self._get_team_data_to_analyze(ConfigConstants.AWAY_TEAM, all_standings_competition, all_teams, match_to_analyze))
 
     def _get_team_data_to_analyze(self, venue_team, all_standings_competition, all_teams, match_to_analyze) -> Dict:
         team_name = match_to_analyze[venue_team]
@@ -54,3 +61,18 @@ class FifaWorldCupAnalysisStatsStrategy(AnalysisStatsStrategy):
         elif team_name_goals < opponent_goals:
             result_tendency = ConfigConstants.RESULT_TENDENCY_LOST
         return [team_name_goals, opponent_goals, result_tendency]
+
+    def _get_opponents_standings_to_teams(self, away_team_data_to_analyze, home_team_data_to_analyze, match_to_analyze):
+        builder = StandingsTableBuilder()
+        away_team_name = match_to_analyze[ConfigConstants.AWAY_TEAM]
+        home_team_name = match_to_analyze[ConfigConstants.HOME_TEAM]
+        return (self._get_opponent_standings_played_to_team(builder, home_team_data_to_analyze, away_team_data_to_analyze[away_team_name][ConfigConstants.POSITION], away_team_name),
+                self._get_opponent_standings_played_to_team(builder, away_team_data_to_analyze, home_team_data_to_analyze[home_team_name][ConfigConstants.POSITION], home_team_name))
+
+    @staticmethod
+    def _get_opponent_standings_played_to_team(builder, team_data_to_analyze, opponent_position, opponent_team_name):
+        return builder.build_from_team_data(
+            team_data=team_data_to_analyze,
+            opponent_name=opponent_team_name,
+            opponent_position=opponent_position
+        )
