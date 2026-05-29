@@ -56,6 +56,9 @@ class ConfigLoader(metaclass=SingletonMeta):
     def get_competition_type_section_at_ini(self, key):
         return self.all_config_ini[key]
 
+    def get_analyzer_matches_path(self):
+        return self.all_config_ini[ConfigConstants.ANALYZERS_FILES][ConfigConstants.ANALYZER_MATCHES_PATH]
+
     def get_telegram_config(self) -> dict:
         return {
             self.constants.TOKEN: self.all_config_ini[self.constants.TELEGRAM][self.constants.TOKEN],

@@ -12,10 +12,10 @@ from main.python.com.football.analyzer.data.infrastructure.adapters.visualizatio
 
 class FifaWorldCupAnalysisStatsStrategy(AnalysisStatsStrategy):
 
-    def execute(self, match_to_analyze: Dict[str, Any], all_teams: Dict[str, Dict[str, Any]], all_standings_competition: Dict):
+    def execute(self, path_to_save_analysis: str, match_to_analyze: Dict[str, Any], all_teams: Dict[str, Dict[str, Any]], all_standings_competition: Dict):
         home_team_data_to_analyze, away_team_data_to_analyze = self._get_teams_data_to_analyze(all_standings_competition, all_teams, match_to_analyze)
         home_opponents_standings, away_opponents_standings = self._get_opponents_standings_to_teams(away_team_data_to_analyze, home_team_data_to_analyze, match_to_analyze)
-        self._get_figs_of_teams(away_opponents_standings, home_opponents_standings, match_to_analyze)
+        self._get_figs_of_teams(path_to_save_analysis, home_opponents_standings, away_opponents_standings, match_to_analyze)
         return None
 
     def _get_teams_data_to_analyze(self, all_standings_competition, all_teams, match_to_analyze):
@@ -82,13 +82,13 @@ class FifaWorldCupAnalysisStatsStrategy(AnalysisStatsStrategy):
         )
 
     @staticmethod
-    def _get_figs_of_teams(away_opponents_standings, home_opponents_standings, match_to_analyze):
+    def _get_figs_of_teams(path_to_save_analysis, home_opponents_standings, away_opponents_standings, match_to_analyze):
         renderer = StandingsTableRenderer()
         home_team_name = match_to_analyze[ConfigConstants.HOME_TEAM]
         away_team_name = match_to_analyze[ConfigConstants.AWAY_TEAM]
         fig_home = renderer.create_figure(home_opponents_standings, home_team_name, away_team_name)
-        fig_home.savefig(f"standings_{home_team_name}_vs_{away_team_name}.png", dpi=150)
+        fig_home.savefig(f"{path_to_save_analysis}\\{home_team_name} Vs {away_team_name}.png", dpi=150)
         plt.close(fig_home)
         fig_away = renderer.create_figure(away_opponents_standings, away_team_name, home_team_name)
-        fig_away.savefig(f"standings_{away_team_name}_vs_{home_team_name}.png", dpi=150)
+        fig_away.savefig(f"{path_to_save_analysis}\\{away_team_name} Vs {home_team_name}.png", dpi=150)
         plt.close(fig_away)

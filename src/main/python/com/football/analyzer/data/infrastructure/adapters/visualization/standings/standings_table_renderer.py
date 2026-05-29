@@ -22,6 +22,7 @@ class StandingsTableRenderer:
 
     @staticmethod
     def _sort_by_date(df: pd.DataFrame) -> pd.DataFrame:
+
         def parse_date(val):
             if val == 'Next Game' or pd.isna(val) or val is None:
                 return pd.NaT
@@ -41,15 +42,8 @@ class StandingsTableRenderer:
         ax.axis('off')
         ax.set_title(title, fontsize=12, fontweight='bold')
         display_df = df[['Position', 'Opponent', 'Match', 'Date']].copy()
-        display_df['Match'] = display_df['Match'].apply(
-            lambda x: self._format_result_tendency(x) if isinstance(x, list) else str(x)
-        )
-        table = ax.table(
-            cellText=display_df.values,
-            colLabels=display_df.columns,
-            cellLoc='center',
-            loc='center'
-        )
+        display_df['Match'] = display_df['Match'].apply(lambda x: self._format_result_tendency(x) if isinstance(x, list) else str(x))
+        table = ax.table(cellText=display_df.values, colLabels=display_df.columns, cellLoc='center', loc='center')
         table.auto_set_font_size(False)
         table.set_fontsize(9)
         table.scale(1.0, 1.2)

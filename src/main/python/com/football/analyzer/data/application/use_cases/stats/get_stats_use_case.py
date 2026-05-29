@@ -1,4 +1,5 @@
 import logging
+import os
 import threading
 from dataclasses import dataclass
 from typing import Dict, Any, List
@@ -181,6 +182,8 @@ class GetStatsUseCase:
             if self._config_loader.get_selector(ConfigConstants.STATUS_MATCH_TO_ANALYZE) == match_to_analyze[ConfigConstants.STATUS]:
                 self._get_stats_to_match(competition_type, match_to_analyze, all_teams, all_standings_competition)
 
-    @staticmethod
-    def _get_stats_to_match(competition_type: str, match_to_analyze: Dict[str, Any], all_teams: Dict[str, Dict[str, Any]], all_standings_competition: Dict) -> None:
-        return StatsCompetitionsTypesFactory.get_stats(competition_type).execute(match_to_analyze, all_teams, all_standings_competition)
+    def _get_stats_to_match(self, competition_type: str, match_to_analyze: Dict[str, Any], all_teams: Dict[str, Dict[str, Any]], all_standings_competition: Dict) -> None:
+        competition_type_split = competition_type.split('_')
+        path_to_save_analysis = f'{self._config_loader.get_analyzer_matches_path()}\\{competition_type_split[0]}\\{competition_type_split[1]}'
+        os.makedirs(path_to_save_analysis, exist_ok=True)
+        return StatsCompetitionsTypesFactory.get_stats(competition_type).execute(path_to_save_analysis, match_to_analyze, all_teams, all_standings_competition)
