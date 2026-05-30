@@ -8,6 +8,7 @@ from main.python.com.football.analyzer.data.commons.config.config_loader import 
 from main.python.com.football.analyzer.data.domain.ports.stats.analysis_stats_strategy import AnalysisStatsStrategy
 from main.python.com.football.analyzer.data.infrastructure.adapters.standings.fifa_world_ranking_excel_adapter import FifaWorldRankingExcelAdapter
 from main.python.com.football.analyzer.data.infrastructure.adapters.visualization.standings.standings_table_renderer import StandingsTableRenderer
+from main.python.com.football.analyzer.data.infrastructure.adapters.visualization.videos.video_creator import VideoCreator
 
 
 class FifaWorldCupAnalysisStatsStrategy(AnalysisStatsStrategy):
@@ -15,7 +16,7 @@ class FifaWorldCupAnalysisStatsStrategy(AnalysisStatsStrategy):
     def execute(self, path_to_save_analysis: str, match_to_analyze: Dict[str, Any], all_teams: Dict[str, Dict[str, Any]], all_standings_competition: Dict):
         home_team_data_to_analyze, away_team_data_to_analyze = self._get_teams_data_to_analyze(all_standings_competition, all_teams, match_to_analyze)
         home_opponents_standings, away_opponents_standings = self._get_opponents_standings_to_teams(away_team_data_to_analyze, home_team_data_to_analyze, match_to_analyze)
-        self._get_figs_of_teams(path_to_save_analysis, home_opponents_standings, away_opponents_standings, match_to_analyze)
+        self._create_video_analysis(path_to_save_analysis, home_opponents_standings, away_opponents_standings, match_to_analyze)
         return None
 
     def _get_teams_data_to_analyze(self, all_standings_competition, all_teams, match_to_analyze):
@@ -82,13 +83,19 @@ class FifaWorldCupAnalysisStatsStrategy(AnalysisStatsStrategy):
         )
 
     @staticmethod
-    def _get_figs_of_teams(path_to_save_analysis, home_opponents_standings, away_opponents_standings, match_to_analyze):
+    def _create_video_analysis(path_to_save_analysis, home_df, away_df, match_to_analyze):
         renderer = StandingsTableRenderer()
         home_team_name = match_to_analyze[ConfigConstants.HOME_TEAM]
         away_team_name = match_to_analyze[ConfigConstants.AWAY_TEAM]
-        fig_home = renderer.create_figure(home_opponents_standings, home_team_name, away_team_name)
-        fig_home.savefig(f"{path_to_save_analysis}\\{home_team_name} Vs {away_team_name}.png", dpi=150)
+        fig_home = renderer.create_figure(home_df, home_team_name, away_team_name)
+        fig_away = renderer.create_figure(away_df, away_team_name, home_team_name)
+        frames = []
+        for _ in range(3):
+            frames.append(VideoCreator.figure_to_array(fig_home))
+        for _ in range(3):
+            frames.append(VideoCreator.figure_to_array(fig_away))
         plt.close(fig_home)
-        fig_away = renderer.create_figure(away_opponents_standings, away_team_name, home_team_name)
-        fig_away.savefig(f"{path_to_save_analysis}\\{away_team_name} Vs {home_team_name}.png", dpi=150)
         plt.close(fig_away)
+        video_creator = VideoCreator(fps=1)
+        output_video = f"{path_to_save_analysis}/{home_team_name} Vs {away_team_name}.mp4"
+        video_creator.create_video_from_arrays(frames, output_video)
