@@ -133,6 +133,10 @@ src/
                             │   ├── stats/
                             │   │   ├── fifa_world_cup_analysis_stats_strategy.py
                             │   │   └── stats_competitions_types_factory.py
+                            │   ├── visualization/
+                            │   │   ├── standings/
+                            │   │   │   └── standings_table_renderer.py
+                            │   │   └── videos/
                             │   └── web/
                             │       ├── app.py
                             │       └── routes/
