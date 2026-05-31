@@ -86,9 +86,12 @@ class FifaWorldCupAnalysisStatsStrategy(AnalysisStatsStrategy):
         renderer = StandingsTableRenderer()
         home_team_name = match_to_analyze[ConfigConstants.HOME_TEAM]
         away_team_name = match_to_analyze[ConfigConstants.AWAY_TEAM]
-        fig_home = renderer.create_figure(home_opponents_standings, home_team_name, away_team_name)
-        fig_home.savefig(f"{path_to_save_analysis}\\{home_team_name} Vs {away_team_name}.png", dpi=150)
-        plt.close(fig_home)
-        fig_away = renderer.create_figure(away_opponents_standings, away_team_name, home_team_name)
-        fig_away.savefig(f"{path_to_save_analysis}\\{away_team_name} Vs {home_team_name}.png", dpi=150)
-        plt.close(fig_away)
+        fig = renderer.create_combined_figure(
+            df_home=home_opponents_standings,
+            df_away=away_opponents_standings,
+            home_team_name=home_team_name,
+            away_team_name=away_team_name
+        )
+        filename = f"{path_to_save_analysis}\\{home_team_name}_vs_{away_team_name}.png"
+        fig.savefig(filename, dpi=150, bbox_inches='tight')
+        plt.close(fig)
